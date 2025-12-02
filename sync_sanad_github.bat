@@ -1,7 +1,7 @@
 @echo off
 cls
 echo =======================================================
-echo         SANAD IDARI — SYNC GITHUB PRO MODE v1.0
+echo         SANAD IDARI — SYNC GITHUB PRO MODE v1.1
 echo =======================================================
 echo.
 
@@ -27,6 +27,20 @@ echo 🔍 Vérification si le dépôt Git est initialisé...
 if not exist ".git" (
     echo 🚀 Aucun dépôt Git détecté — Initialisation...
     git init
+)
+
+echo.
+echo 🔄 Vérification de la branche actuelle...
+for /f "tokens=*" %%i in ('git branch --show-current') do set CURRENT_BRANCH=%%i
+
+if "%CURRENT_BRANCH%"=="" set CURRENT_BRANCH=master
+
+echo 🔎 Branche actuelle : %CURRENT_BRANCH%
+
+echo.
+if "%CURRENT_BRANCH%"=="master" (
+    echo 🔀 Renommage de master → main...
+    git branch -M main
 )
 
 echo.
