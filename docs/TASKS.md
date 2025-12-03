@@ -1,29 +1,34 @@
-# TASKS.md — Suivi des tâches
+# TASKS.md — Suivi des Tâches du Projet (PRO MODE)
 
-## Terminées
-- Migration HostPapa → Vercel
-- Suppression scripts et watchdog
-- Mise en place /docs
-- Système PRO agents GPT
-- Vérification GitHub
-- Stabilisation documentation
+## 🔵 TÂCHES TERMINÉES
+- Migration de HostPapa vers Vercel
+- Suppression des scripts PowerShell (deploy.ps1)
+- Suppression du watchdog Windows
+- Mise en place du dossier /docs
+- Mise en place du système PRO pour agents GPT
+- Ajout de la Règle d’Or PRO MODE
+- Vérification du dépôt GitHub (structure + branche main)
+- Stabilisation de la documentation /docs
+- Ajout de build_web.yml (GitHub Actions)
+- Ajout de vercel.json
 
-## En cours
-- Configuration déploiement Flutter Web sur Vercel
+## 🟡 TÂCHES EN COURS
+- Configuration du déploiement Flutter Web sur Vercel
 
-## À faire
-- Import repo dans Vercel
-- Choisir “Other”
-- Build : flutter build web --release
-- Output : build/web
-- Premier déploiement
-- Vérification logs
-- Mise à jour STATE_PROJECT.md & TASKS.md
+## 🔴 TÂCHES À FAIRE (PROCHAINES ACTIONS)
+- Vérifier la configuration du projet dans Vercel
+- Définir le Framework : Other
+- Définir la commande : flutter build web --release
+- Définir l’output : build/web
+- Lancer le premier déploiement sur Vercel
+- Vérifier les logs Vercel
+- Mettre à jour STATE_PROJECT.md après déploiement
+- Mettre à jour TASKS.md (déplacement en “terminées”)
 
-## Bloquées
-Aucune
+## ⚫ TÂCHES BLOQUÉES
+- Aucune tâche bloquée actuellement
 
-## Idées futures
+## 🟣 IDÉES / AMÉLIORATIONS FUTURES
 - SEO Flutter Web
-- Documentation finale
-- Amélioration CI/CD
+- Documentation utilisateur finale
+- Amélioration CI/CD (optimiser GitHub Actions)
