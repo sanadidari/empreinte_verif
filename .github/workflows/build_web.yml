@@ -1,23 +1,22 @@
-name: Flutter Web Build & Verification
+name: Flutter Web Build & Deploy to Vercel
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  build-web:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.0"   # Mets ici TA version Flutter exacte
+          flutter-version: "3.27.0"
 
       - name: Flutter clean & pub get
         run: |
@@ -27,31 +26,10 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release
 
-      - name: Generate Checksums
-        run: |
-          cd build/web
-          sha256sum \
-            index.html \
-            main.dart.js \
-            flutter.js \
-            flutter_bootstrap.js \
-            version.json \
-            > checksums.txt
+      - name: Install Vercel CLI
+        run: npm install -g vercel
 
-      - name: Archive Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: web_build_release
-          path: build/web/
-
-      - name: Upload Checksums
-        uses: actions/upload-artifact@v3
-        with:
-          name: web_checksums
-          path: build/web/checksums.txt
-
-      - name: Summary Report
-        run: |
-          echo "## BUILD COMPLETED SUCCESSFULLY" >> $GITHUB_STEP_SUMMARY
-          echo "Commit: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
-          echo "Checksums generated in build/web/checksums.txt" >> $GITHUB_STEP_SUMMARY
+      - name: Deploy to Vercel (Production)
+        run: vercel deploy --prod --yes --token=$VERCEL_TOKEN --scope=sanad-idari build/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
