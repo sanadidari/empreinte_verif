@@ -1,175 +1,141 @@
-# 🌐 Empreinte Vérif — Sanad Idari  
-## Flutter Web • CI/CD GitHub • Déploiement Vercel • Documentation PRO
+📄 README.md — VERSION Enterprise PRO (à coller)
+# SANAD IDARI — empreinte_verif  
+### Flutter Web • Vercel • Pipeline GitHub • Documentation PRO
+
+Ce dépôt contient le projet **Sanad Idari — empreinte_verif**, une application **Flutter Web** déployée automatiquement sur **Vercel** via la branche Git `main`.
+
+L’objectif du projet est de fournir un module de vérification administrative (QR / empreinte) via une interface Web moderne, fiable et hautement maintenable.
 
 ---
 
-## 🚀 Introduction  
-**Empreinte Vérif** est une application Flutter Web intégrée dans l’écosystème *Sanad Idari*.  
-Le projet inclut :
+# 🏗️ Architecture Technique
 
-- Une interface web Flutter optimisée  
-- Un pipeline CI/CD GitHub Actions  
-- Un déploiement automatique vers Vercel  
-- Un domaine personnalisé : `qrpruf.sanadidari.com`  
-- Une documentation complète pour agents & développeurs  
+## 🔷 Stack
+- **Flutter Web**
+- **Dart**
+- **Vercel** (hébergement & CDN global)
+- **GitHub** (source of truth)
+- **CI/CD automatique** via `git push origin main`
 
-L’objectif : disposer d’un système robuste, automatisé et parfaitement documenté.
+## 🔷 Structure du projet
 
----
 
-## 🛠 Technologie
 
-| Technologie | Rôle |
-|------------|------|
-| **Flutter Web** | Frontend Web |
-| **Vercel** | Hébergement & CDN |
-| **GitHub Actions** | CI/CD automatisé |
-| **HostPapa** | Gestion du DNS (uniquement CNAME) |
-
----
-
-## 📂 Architecture du projet
-empreinte_verif/
-├── lib/
-├── web/
-├── build/ (généré automatiquement)
-├── docs/ (documentation PRO)
-│ ├── AGENT_START.md
-│ ├── TASKS.md
-│ ├── STATE_PROJECT.md
-│ ├── VERCEL_DEPLOY.md ← nouveau
-│ └── ...
-├── .github/
-│ └── workflows/
-│ └── build_web.yml
-├── vercel.json
-├── pubspec.yaml
-└── README.md
+/
+├── lib/ # Code Flutter
+├── web/ # Entrée Flutter Web (index.html, icons...)
+├── build/web/ # Généré par flutter build web --release
+├── docs/ # Documentation PRO des agents GPT
+├── pubspec.yaml # Dépendances Flutter
+└── vercel.json (optionnel) # Routage SPA
 
 
 ---
 
-## ⚙️ CI/CD — Déploiement Automatique
+# 🚀 Pipeline de Déploiement
 
-Chaque push sur la branche `main` déclenche automatiquement :
-
-1. Installation de Flutter  
-2. Nettoyage + `pub get`  
-3. Build Flutter Web (`flutter build web`)  
-4. Déploiement automatique sur **Vercel Production**  
-
-### 🔧 Fichier : `.github/workflows/build_web.yml`  
-Voir le workflow complet ici :  
-➡️ `/github/workflows/build_web.yml`
-
----
-
-## 🌍 Domaine & DNS
-
-Le domaine utilisé pour la WebApp :
-
-### **✔ https://qrpruf.sanadidari.com**
-
-DNS configurés dans HostPapa :
+## 🔹 Workflow complet
 
 
-
-qrpruf.sanadidari.com → CNAME → 9a0a2fdeff44fe9e.vercel-dns-017.com
-www.qrpruf.sanadidari.com
- → CNAME → qrpruf.sanadidari.com
+Développeur → Git push main → Vercel Build → Vercel Deploy → Domaine final
 
 
-Vercel émet ensuite automatiquement :
-
-- Le certificat SSL  
-- La redirection `www → root`  
-- Le routage SPA (via vercel.json)  
-
----
-
-## 🧭 Routage Flutter (vercel.json)
-
-Pour que toutes les routes Flutter soient gérées correctement :
-
-```json
-{
-  "version": 2,
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
-}
+## 🔹 Commande de build
 
 
-Évite le 404 sur navigation interne.
-
-📚 Documentation complète
-
-Toute la documentation est disponible dans le dossier /docs.
-
-🔗 Documents principaux :
-Document	Rôle
-VERCEL_DEPLOY.md	Déploiement complet Vercel + DNS
-STATE_PROJECT.md	État du projet
-TASKS.md	Tâches réalisées / à faire
-HISTORY.md	Historique complet
-AGENT_START.md	Instructions pour nouveaux agents
-ARCHITECTURE.md	Architecture complète du projet
-
-Documentation centrale
-➡️ /docs/VERCEL_DEPLOY.md
-
-🧪 Tester en local
-flutter clean
-flutter pub get
-flutter run -d chrome
-
-🚀 Build manuel (si besoin)
 flutter build web --release
 
 
-Les fichiers sont générés dans :
-➡️ build/web/
+## 🔹 Output utilisé par Vercel
 
-👥 Agents & Collaboration
 
-Le projet suit un protocole strict :
+build/web
 
-PRO MODE
 
-Documentation obligatoire
+## 🔹 Domaine final
+https://qrpruf.sanadidari.com  
+(CNAME → Vercel)
 
-Mise à jour du state après chaque tâche
+---
 
-Un seul changement validé à la fois
+# 🤖 Système d’Agents GPT — PRO MODE
 
-Fichiers complets lors de chaque modification
+Ce projet est optimisé pour être maintenu par **des agents GPT professionnels**.  
+Les règles complètes se trouvent dans `/docs`.
 
-Lecture obligatoire des fichiers dans /docs
+## 🔹 Règles fondamentales
+- Toujours travailler en **PRO MODE**
+- Jamais d’invention
+- Toujours lire `/docs` + dépôt GitHub avant toute action
+- Une seule action à la fois : proposer → valider → exécuter → documenter
+- Mise à jour obligatoire de :
+  - `STATE_PROJECT.md`
+  - `TASKS.md`
 
-Règles complètes :
-➡️ /docs/RULES.md
+## 🔹 Fichiers cruciaux pour les agents
 
-🛡 Maintenance & Monitoring
 
-Logs Vercel :
-https://vercel.com/sanad-idari/empreinte-verif
+docs/AGENT_START.md
+docs/AGENT_STARTUP_CHECKLIST.md
+docs/NEXT_ACTION.md
+docs/STATE_PROJECT.md
+docs/RULES.md
+docs/ARCHITECTURE.md
+docs/HISTORY.md
+docs/DEPLOY_GUIDE_VERCEL.md
+docs/TASKS.md
+docs/CHECKLIST_MASTER.md
 
-Logs GitHub Actions :
-https://github.com/sanadidari/empreinte_verif/actions
 
-🏁 Résumé
+---
 
-Ce projet est désormais :
+# 📚 Documentation PRO
 
-✔ Automatisé
-✔ Sécurisé
-✔ Documenté
-✔ Déployé
-✔ Professionnel
+Toute la documentation du projet se trouve dans le dossier :
 
-Grâce à la combinaison Flutter + Vercel + GitHub Actions + DNS propre.
+➡️ **/docs**  
 
-🧑‍💻 Auteur & Gestion
+Elle couvre :
 
-Sanad Idari
-Gestion assistée par Agent PRO (ChatGPT)
+- Règle d’Or  
+- Processus agents GPT  
+- Architecture Flutter/Vercel  
+- Guide de déploiement  
+- Roadmap & tâches  
+- Historique complet  
+
+---
+
+# 🛠️ Développeur — Commandes utiles
+
+## 🔹 Installation Flutter Web
+
+
+flutter config --enable-web
+flutter doctor
+
+
+## 🔹 Build
+
+
+flutter build web --release
+
+
+## 🔹 Déploiement (automatique)
+
+
+git add .
+git commit -m "update"
+git push origin main
+
+
+---
+
+# 📞 Assistance & Contact
+Ce projet est maintenu dans le cadre de **Sanad Idari**.  
+Pour toute assistance technique, veuillez utiliser la section Issues du dépôt GitHub ou contacter l’administrateur.
+
+---
+
+# ✔️ FIN DU FICHIER
+Version : 1.0 — Enterprise PRO
