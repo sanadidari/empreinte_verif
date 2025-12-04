@@ -1,7 +1,15 @@
 {
   "version": 2,
-  "public": true,
   "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/icons/(.*)", "dest": "/icons/$1" },
+    { "src": "/flutter_bootstrap.js", "dest": "/flutter_bootstrap.js" },
+    { "src": "/main.dart.js", "dest": "/main.dart.js" },
+    { "src": "/flutter_service_worker.js", "dest": "/flutter_service_worker.js" },
+
+    { "src": "/manifest.json", "dest": "/manifest.json" },
+    { "src": "/version.json", "dest": "/version.json" },
+
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
