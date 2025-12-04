@@ -9,11 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-<<<<<<< HEAD
-      - name: Checkout private repo
-=======
       - name: Checkout source repository
->>>>>>> dfc0698 (Add military documentation system + updated README)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -22,21 +18,12 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.MIRROR_DEPLOY_KEY }}
-<<<<<<< HEAD
-          known_hosts: |
-            github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICW8WcN6iYG3PaY5E9O+V1YxDCEV4VpWwfvX2gCtYdZ
-=======
           known_hosts: github.com
->>>>>>> dfc0698 (Add military documentation system + updated README)
 
       - name: Add mirror remote
         run: |
           git remote add mirror git@github.com:sanadidari/empreinte_verif_mirror.git
 
-<<<<<<< HEAD
-      - name: Push to mirror
-=======
       - name: Force push to mirror
->>>>>>> dfc0698 (Add military documentation system + updated README)
         run: |
           git push --force mirror main
