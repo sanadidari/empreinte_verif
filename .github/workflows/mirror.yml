@@ -18,7 +18,8 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.MIRROR_DEPLOY_KEY }}
-          known_hosts: "|1|aW50ZXJuYWwtbXJyLWhvc3QgZm9yY2UgYWNB"
+          known_hosts: |
+            github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMfq5lHnZArYdS4x+h0cYfZfbQfVIAtF5NCz7r+IuXh
 
       - name: Add mirror remote
         run: |
