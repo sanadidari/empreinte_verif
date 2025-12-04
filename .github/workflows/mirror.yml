@@ -19,7 +19,7 @@ jobs:
         with:
           key: ${{ secrets.MIRROR_DEPLOY_KEY }}
           known_hosts: |
-            github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMfq5lHnZArYdS4x+h0cYfZfbQfVIAtF5NCz7r+IuXh
+            github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICW8WcN6iYG3PaY5E9O+V1YxDCEV4VpWwfvX2gCtYdZ
 
       - name: Add mirror remote
         run: |
