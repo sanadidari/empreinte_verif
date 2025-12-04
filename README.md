@@ -119,5 +119,5 @@ docs/architecture.png
 🧑‍💻 8. Auteur
 
 Projet initié par Sanad Idari.
-
+---------
    
