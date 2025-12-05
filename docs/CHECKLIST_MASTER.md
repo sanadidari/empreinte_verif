@@ -1,159 +1,123 @@
-📄 CHECKLIST_MASTER.md — Version PRO
-🧾 CHECKLIST MASTER — Sanad Idari — empreinte_verif
-
-Cette checklist sert de référence centrale pour :
-
-le démarrage d’un agent GPT
-
-la vérification du projet
-
-l’exécution d’une action
-
-la mise à jour des documents
-
-le suivi du déploiement
-
-Elle doit être suivie strictement, dans l’ordre.
-
-1. 🔵 CHECKLIST DÉMARRAGE — Agents GPT
-✔ 1.1 Vérifier accès GitHub
-
-Dépôt public ? → Oui / Non
-
-Tester URLs RAW
-
-Si échec → demander à l’utilisateur : rendre public / raw / coller docs
-
-✔ 1.2 Lire tous les fichiers /docs
-
-AGENT_START.md
-
-AGENT_STARTUP_CHECKLIST.md
-
-NEXT_ACTION.md
-
-STATE_PROJECT.md
-
-RULES.md
-
-ARCHITECTURE.md
-
-HISTORY.md
-
-DEPLOY_GUIDE_VERCEL.md
-
-TASKS.md
-
-CHECKLIST_MASTER.md
-
-✔ 1.3 Vérifier le code Flutter
-
-pubspec.yaml
-
-lib/
-
-web/
-
-Compatibilité Flutter Web
-
-Présence vercel.json (si utilisé)
-
-✔ 1.4 Générer la première réponse (obligatoire)
-
-Résumé du projet
-
-Résumé de l’état actuel
-
-Next Action
-
-Plan étape 1
-
-Demander validation
-
-2. 🔵 CHECKLIST EXÉCUTION ACTION
-
-Pour chaque action :
-
-✔ 2.1 Proposer une seule action
-
-→ Tout doit commencer par une proposition.
-
-✔ 2.2 Attendre validation utilisateur
-
-→ Jamais exécuter sans validation explicite.
-
-✔ 2.3 Exécuter l’action
-
-→ Fournir fichiers complets (si modification)
-
-✔ 2.4 Mise à jour /docs
-
-Mettre à jour :
-
-STATE_PROJECT.md
-
-TASKS.md
-
-fichier(s) modifié(s)
-
-✔ 2.5 Indiquer commandes Git à exécuter
-
-Exemple :
-
-git add .
-git commit -m "update: déploiement Vercel"
-git push origin main
-
-3. 🔵 CHECKLIST DÉPLOIEMENT — Flutter Web → Vercel
-✔ 3.1 Build Flutter Web
-flutter build web --release
-
-✔ 3.2 Importation dans Vercel
-
-Import GitHub
-
-Framework : Other
-
-Build Command : flutter build web --release
-
-Output : build/web
-
-✔ 3.3 Tester
-
-Aucune page blanche
-
-trunk logs OK
-
-assets OK
-
-✔ 3.4 DNS
-
-qrpruf.sanadidari.com → CNAME vers Vercel
-
-✔ 3.5 Mise à jour /docs
-STATE_PROJECT.md
-TASKS.md
-HISTORY.md (optionnel)
-
-4. 🔵 CHECKLIST MAINTENANCE
-✔ 4.1 Vérifier :
-
-Structure Flutter
-
-Dépendances
-
-Logs Vercel
-
-Propreté du repo
-
-Cohérence des docs
-
-✔ 4.2 Planifier :
-
-SEO Flutter Web
-
-Documentation finale
-
-Amélioration CI/CD
-
-✔ FIN DU FICHIER
+## CHECKLIST_MASTER.md — MASTER CONTROL CHECKLIST (MCC-1)
+Projet : empreinte_verif
+Classification : STRICT — GLOBAL — ZERO-ERROR
+
+Cette checklist regroupe les validations essentielles permettant de
+confirmer que le projet est :
+  - fonctionnel,
+  - synchronisé,
+  - sécurisé,
+  - conforme au protocole militaire.
+
+----------------------------------------------------------------------
+1. VALIDATION GITHUB
+
+[ ] Repo privé accessible  
+[ ] Dossiers /lib, /web, /docs présents  
+[ ] Workflows présents  
+[ ] RAW accessible  
+[ ] Dernier commit récupéré  
+
+[ ] Repo miroir accessible  
+[ ] Docs présentes dans le miroir  
+[ ] Hash miroir ≈ hash privé  
+[ ] Statut : SYNC  
+
+----------------------------------------------------------------------
+2. VALIDATION DOCUMENTATION
+
+[ ] AGENT_PROTOCOL.md lu  
+[ ] STARTUP_CHECKLIST.md lu  
+[ ] NEXT_ACTION.md lu  
+[ ] STATE_PROJECT.md lu  
+[ ] RULES.md lu  
+[ ] ARCHITECTURE.md lu  
+[ ] HISTORY.md lu  
+[ ] DEPLOY_GUIDE.md lu  
+[ ] TASKS.md lu  
+[ ] CHECKLIST_MASTER.md lu  
+
+Aucune action autorisée sans lecture complète des docs.
+
+----------------------------------------------------------------------
+3. VALIDATION SECRETS & SÉCURITÉ
+
+[ ] VERCEL_TOKEN présent  
+[ ] MIRROR_DEPLOY_KEY présent  
+[ ] Clé SSH non exposée  
+[ ] Aucun secret dans le repo  
+[ ] Pas de fichier sensible en clair  
+
+----------------------------------------------------------------------
+4. VALIDATION CI/CD
+
+Workflow build_web.yml :
+  [ ] flutter clean  
+  [ ] flutter pub get  
+  [ ] flutter build web --release  
+  [ ] déploiement Vercel OK  
+
+Workflow mirror.yml :
+  [ ] SSH key install  
+  [ ] known_hosts configuré  
+  [ ] mirror remote correct  
+  [ ] push --force fonctionne  
+
+----------------------------------------------------------------------
+5. VALIDATION FLUTTER WEB
+
+[ ] lib/ stable  
+[ ] web/ complet  
+[ ] index.html correct  
+[ ] bootstrap OK  
+[ ] manifest.json OK  
+[ ] icons/ présents  
+[ ] assets/ présents  
+[ ] build local fonctionne  
+
+----------------------------------------------------------------------
+6. VALIDATION VERCEL
+
+[ ] vercel.json présent  
+[ ] SPA fallback actif  
+[ ] main.dart.js chargé  
+[ ] aucune erreur console  
+[ ] pas d’assets manquants  
+
+Domaines :
+  [ ] qrpruf.sanadidari.com OK  
+  [ ] www.qrpruf.sanadidari.com OK  
+  [ ] SSL actif  
+  [ ] CNAME correct  
+
+----------------------------------------------------------------------
+7. VALIDATION NEXT_ACTION
+
+[ ] Prochaine action identifiée  
+[ ] Aucun travail hors NEXT_ACTION  
+[ ] Étape en cours validée par utilisateur  
+[ ] Règle : une seule action à la fois  
+
+----------------------------------------------------------------------
+8. VALIDATION MISE À JOUR DES DOCS
+
+Après action exécutée :
+  [ ] fichier modifié mis à jour  
+  [ ] TASKS.md mis à jour  
+  [ ] STATE_PROJECT.md mis à jour  
+  [ ] HISTORY.md mis à jour (si nécessaire)  
+
+----------------------------------------------------------------------
+9. VALIDATION COMMITS
+
+Commandes obligatoires :
+  git add .
+  git commit -m "<message clair>"
+  git push
+
+[ ] Commit exécuté  
+[ ] Miroir auto-synchronisé  
+[ ] Déploiement trigger (si applicable)  
+
+----------------------------------------------------------------------
+FIN DU FICHIER — CHECKLIST_MASTER.md v1.0 (FORMAT 80 COLONNES)

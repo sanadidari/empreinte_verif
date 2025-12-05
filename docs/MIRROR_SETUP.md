@@ -1,77 +1,59 @@
-🔁 GitHub Mirror System — Setup & Maintenance Guide
-📌 1. Overview
+## MIRROR_SETUP.md — GITHUB MIRROR DOSSIER (GMD-1)
+Projet : empreinte_verif
+Classification : STRICT — OPÉRATIONNEL — SÉCURISÉ
 
-This document explains how the automatic mirroring system works between:
+Ce document décrit la configuration officielle du miroir public utilisé
+par les agents GPT pour lire le code sans exposer le dépôt privé.
 
-Private repo → sanadidari/empreinte_verif
+----------------------------------------------------------------------
+1. OBJECTIF DU MIROIR
 
-Public mirror repo → sanadidari/empreinte_verif_mirror
+Le miroir permet :
+  - accès lecture agents GPT
+  - protection du repo privé
+  - synchro automatique
+  - cohérence totale hash privé = hash miroir
 
-Each push to the main branch triggers a GitHub Action that mirrors your code to the public repo.
+Source unique de lecture :
+  https://github.com/sanadidari/empreinte_verif_mirror
 
-📌 2. Current System Status
-Component	Status
-SSH private key generated	✔ OK
-SSH public key added as Deploy Key	✔ OK (write access required)
-Secret MIRROR_DEPLOY_KEY created	⚠ Must be checked (format issue possible)
-Workflow .github/workflows/mirror.yml	✔ Installed
-Workflow execution	❌ Fails due to missing key input (secret not read)
-Automatic mirroring	⬜ Pending fix
-📌 3. TODO LIST — Steps to Complete
-🔧 Step 1 — Confirm Deploy Key in Public Repo
+----------------------------------------------------------------------
+2. ARCHITECTURE DU MIROIR
 
-Location: empreinte_verif_mirror → Settings → Deploy Keys
+Source :      repo privé → empreinte_verif  
+Destination : repo public → empreinte_verif_mirror  
 
-Ensure the key is present
+Méthode :
+  - GitHub Actions
+  - clé SSH MIRROR_DEPLOY_KEY
+  - push --force
 
-Enable “Allow write access”
+----------------------------------------------------------------------
+3. CONFIGURATION DES CLÉS SSH
 
-🔧 Step 2 — Fix the Secret MIRROR_DEPLOY_KEY
+1. Générer la clé SSH :
+     ssh-keygen -t ed25519 -C "mirror"
 
-Location: empreinte_verif → Settings → Secrets → Actions
+2. Ajouter la clé publique AU MIROIR :
+     Settings → Deploy Keys → Add key  
+     Activer : Allow write access
 
-Checklist:
+3. Ajouter la clé privée AU REPO PRIVÉ :
+     Settings → Secrets → Actions → MIRROR_DEPLOY_KEY
 
-Name must be exactly: MIRROR_DEPLOY_KEY
+----------------------------------------------------------------------
+4. WORKFLOW OFFICIEL — mirror.yml
 
-Paste the private key with no extra spaces or blank lines
-
-It must follow this exact structure:
-
------BEGIN OPENSSH PRIVATE KEY-----
-...
------END OPENSSH PRIVATE KEY-----
-
-Common mistakes to avoid:
-
-Blank line before BEGIN
-
-Blank line after END
-
-Extra spaces at left/right
-
-Missing lines inside the key
-
-🔧 Step 3 — Validate the mirror.yml Workflow File
-
-Path:
-
-/.github/workflows/mirror.yml
-
-Correct full content:
-
+```yaml
 name: Mirror to Public Repo
-
 
 on:
   push:
     branches: [ "main" ]
 
-
 jobs:
   mirror:
     runs-on: ubuntu-latest
-
 
     steps:
       - name: Checkout source repository
@@ -79,78 +61,48 @@ jobs:
         with:
           fetch-depth: 0
 
-
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.MIRROR_DEPLOY_KEY }}
           known_hosts: github.com
 
-
       - name: Add mirror remote
-        run: |
-          git remote add mirror git@github.com:sanadidari/empreinte_verif_mirror.git
-
+        run: git remote add mirror \
+             git@github.com:sanadidari/empreinte_verif_mirror.git
 
       - name: Force push to mirror
-        run: |
-          git push --force mirror main
+        run: git push --force mirror main
+```
 
-Important:
+----------------------------------------------------------------------
+5. COMPORTEMENT ATTENDU
 
-Indentation must be 2 spaces
+À chaque push sur main :
+  - le repo privé exécute le workflow
+  - le miroir se met à jour
+  - hash miroir = hash privé
+  - agents GPT lisent le miroir
 
-The line key: ${{ secrets.MIRROR_DEPLOY_KEY }} must match the secret name exactly
+Si OUTDATED :
+  - vérifier logs Actions
+  - vérifier clé SSH
+  - vérifier Deploy Key
 
-🔧 Step 4 — Manual Trigger Test
+----------------------------------------------------------------------
+6. SÉCURITÉ MILITAIRE
 
-After fixing the secret:
+Interdictions :
+  ❌ exposer clé privée  
+  ❌ committer id_ed25519  
+  ❌ utiliser HTTPS pour miroir  
+  ❌ modifier workflow sans validation  
+  ❌ enlever write access du miroir  
 
-Edit any file (e.g., README.md)
+Obligatoire :
+  ✔ garder MIRROR_DEPLOY_KEY secret  
+  ✔ vérifier sync status  
+  ✔ utiliser push --force  
 
-Commit the change
-
-GitHub Actions → Watch the workflow run
-
-Expected result:
-
-🟢 Success → mirroring works
-
-🔴 Failure: key required → secret still misformatted
-
-📌 4. Troubleshooting
-❌ Error: Input required and not supplied: key
-
-Causes:
-
-Secret not saved
-
-Formatting incorrect
-
-Extra blank line
-
-YAML referencing wrong secret name
-
-Solution: Re‑paste the private key exactly with no modifications.
-
-📌 5. When Everything Works
-
-Once green:
-
-Every push to main instantly updates the public repo
-
-No local action required
-
-Fully automated deployment ✓
-
-📌 6. Future Enhancements (optional)
-
-Add scheduled nightly sync (cron)
-
-Add protection logic (ignore deleted branches)
-
-Enable Discord/email notifications
-
-📌 7. Last Updated
-
-04 Dec 2025 — ChatGPT PRO Session
+----------------------------------------------------------------------
+FIN DU FICHIER — MIRROR_SETUP.md v1.1 (FORMAT 80 COLONNES)

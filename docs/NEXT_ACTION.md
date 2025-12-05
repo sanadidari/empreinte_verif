@@ -1,112 +1,148 @@
-📄 NEXT_ACTION.md — Version PRO
-🔥 NEXT ACTION — Déploiement Flutter Web sur Vercel
+📄 NEXT_ACTION.md — PROTOCOL TASK ORDER (PTO-1)
+Projet : empreinte_verif — Niveau : TOP PRIORITY — Zero-Error
+🎯 Mission Actuelle (Unique, Bloquante, Obligatoire)
 
-Ceci est la prochaine action officielle, validée, bloquante, et unique pour le projet Sanad Idari — empreinte_verif.
+La prochaine action opérationnelle définie pour ce projet, au moment présent, est :
 
-1. 🎯 Objectif
+🟥 NEXT ACTION — Vérification & Exécution du pipeline Flutter Web + Vercel
+Objectif :
 
-Déployer la version Flutter Web du projet sur Vercel, en utilisant :
+Garantir que la chaîne suivante fonctionne parfaitement :
 
-Pipeline : GitHub → Vercel
+GitHub (repo privé) 
+    → Workflow build_web.yml 
+    → Production du dossier build/web 
+    → Déploiement automatique via Vercel (VERCEL_TOKEN)
+    → Publication finale sur domaine qrpruf.sanadidari.com
 
-Build : flutter build web --release
 
-Output : build/web
+Cette action est la seule autorisée jusqu’à finalisation complète.
 
-Framework : Other
-
-2. 📌 Pourquoi cette action ?
+📌 Pourquoi cette action ? (justification militaire)
 
 Selon STATE_PROJECT.md et TASKS.md :
 
-Migration HostPapa → Vercel terminée
+Le code Flutter est stable
 
-Nettoyage environnement terminé
+Le système de mirroring privé → public est opérationnel
 
-Système PRO actif
+L’infrastructure GitHub Actions a été rétablie
 
-Code Flutter prêt pour compilation
+Le domaine qrpruf.sanadidari.com pointe vers Vercel
 
-/docs stabilisé
+Le fichier vercel.json est correct
 
-➡️ Le projet est techniquement prêt pour un premier déploiement Flutter Web.
+Le workflow build_web.yml est en place
 
-3. 🧱 Prérequis
+Donc :
+👉 Le projet est prêt pour un déploiement automatique fiable.
 
-Avant de commencer :
+🔧 Prérequis obligatoires
 
-Le repo doit être lisible :
-https://github.com/sanadidari/empreinte_verif
+Avant d’exécuter cette action, l’agent doit vérifier :
 
-Le dossier web Flutter doit exister
+A — Côté GitHub
 
-pubspec.yaml doit être valide
+build_web.yml existe et est valide
 
-Branch main à jour
+Secret : VERCEL_TOKEN → présent
 
-Code compatible Flutter Web
+Secret : MIRROR_DEPLOY_KEY → présent
 
-L’agent doit avoir lu tous les fichiers /docs
+Flutter Web → activé dans workflow
 
-4. 🚀 Étapes exactes du déploiement Vercel
-1️⃣ Aller sur :
+build command : flutter build web --release
 
-https://vercel.com/import
+output directory : build/web
 
-2️⃣ Choisir Import GitHub Repository
-3️⃣ Sélectionner le repo :
+B — Côté projet Flutter
 
-sanadidari/empreinte_verif
+/web/ contient index.html
 
-4️⃣ Framework → Other
-5️⃣ Build Command :
+/web/ contient flutter_bootstrap.js
+
+/web/ contient icons/, assets/, manifest.json
+
+base-href correct dans index.html
+
+C — Côté Vercel
+
+Vercel projet connecté au repo privé
+
+Domaine configuré : qrpruf.sanadidari.com
+
+CNAME actif : vercel-dns-017.com
+
+SSL activé
+
+🛠 Étapes exactes que l’agent doit exécuter (UNE PAR UNE)
+1️⃣ Vérifier le workflow build_web.yml
+
+Confirmer que :
+
+flutter clean
+flutter pub get
 flutter build web --release
 
-6️⃣ Output Directory :
-build/web
 
-7️⃣ Lancer le déploiement
-8️⃣ Tester le preview link :
+sont présents.
 
-routing
+2️⃣ Lancer un test de build (dry run)
 
-performance
+L’agent doit vérifier :
 
-erreurs console
+taille du main.dart.js
 
-9️⃣ Après succès → mettre à jour :
+absence d’erreurs console
+
+absence d’assets manquants
+
+3️⃣ Déclencher un déploiement Vercel via GitHub Actions
+
+En faisant un git commit minimal.
+
+4️⃣ Analyser le log Vercel
+
+Chercher :
+
+erreurs d’assets
+
+erreurs de routage
+
+erreurs de compression
+
+404 internes
+
+5️⃣ Confirmer le déploiement
+
+Sur :
+
+https://qrpruf.sanadidari.com
+https://www.qrpruf.sanadidari.com
+
+6️⃣ Mettre à jour documentation
+
+Obligatoire :
 
 STATE_PROJECT.md
 
 TASKS.md
 
-Historique (HISTORY.md, optionnel)
+HISTORY.md (optionnel)
 
-5. 📘 Définition de Done (critères de succès)
+🟩 Définition de DONE
 
-L’action est considérée réussie quand :
+L’action est considérée réussie lorsque :
 
-Le déploiement Vercel s'exécute sans erreur
+✔ Workflow build_web.yml s’exécute sans erreur
+✔ Vercel déploie automatiquement
+✔ Le site s’ouvre sans page blanche
+✔ Aucune erreur console Flutter Web
+✔ Le domaine personnalisé fonctionne
+✔ Les docs sont mises à jour
 
-Le site est accessible sur l’URL preview fournie par Vercel
+🟥 Après finalisation (uniquement ensuite)
 
-Le routing fonctionne
+La prochaine action possible sera créée et validée manuellement par l’utilisateur.
 
-Aucune page blanche
-
-Aucun crash Flutter Web
-
-Les fichiers /docs sont mis à jour
-
-6. ✍️ Fichiers à mettre à jour après cette action
-Obligatoires :
-
-STATE_PROJECT.md
-
-TASKS.md
-
-Optionnel :
-
-HISTORY.md
-
-✔ FIN DU FICHIER
+🟥 FIN DU FICHIER 3/10 — NEXT_ACTION.md

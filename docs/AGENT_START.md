@@ -1,169 +1,123 @@
-📄 AGENT_START.md — Version PRO
-🎛️ Démarrage Agents GPT — Projet Flutter Sanad Idari — empreinte_verif
+## AGENT_START.md — QUICK START MILITAIRE (QS-1)
+Projet : empreinte_verif
+Classification : STRICT — ZÉRO-ERREUR — PRO MODE
+
+Ce document explique comment un agent GPT doit démarrer immédiatement
+sur le projet. C’est une vue rapide, simplifiée et militaire qui mène
+ensuite vers AGENT_PROTOCOL.md pour la procédure complète.
+
+----------------------------------------------------------------------
+1. OBJECTIF DU QUICK START
+
+Fournir à l’agent :
+  - la vue d’ensemble
+  - les premières étapes obligatoires
+  - le point d’entrée vers les docs militaires
+  - la confirmation de la source de vérité
+
+----------------------------------------------------------------------
+2. SOURCE DE VÉRITÉ OFFICIELLE
+
+Le code et la documentation DOIVENT être lus uniquement depuis :
+
+➡️ Repo miroir public (source unique)
+https://github.com/sanadidari/empreinte_verif_mirror
+
+Le repo privé ne sert qu’à :
+  - lancer CI/CD
+  - exécuter workflows
+  - déployer sur Vercel
+
+L’agent ne lit jamais le repo privé en premier.
+
+----------------------------------------------------------------------
+3. ÉTAPES DE DÉMARRAGE RAPIDE (VERSION COURTE)
+
+1️⃣ Lire ce fichier (AGENT_START.md)  
+2️⃣ Lire AGENT_PROTOCOL.md  
+3️⃣ Lire STARTUP_CHECKLIST.md  
+4️⃣ Effectuer les SCANS obligatoires  
+5️⃣ Produire le RAPPORT INITIAL  
+6️⃣ STOP — attendre validation utilisateur  
+
+----------------------------------------------------------------------
+4. ÉTAPES DE DÉMARRAGE DÉTAILLÉES
+
+4.1 Lire les documents dans cet ordre :
+  1. AGENT_START.md (ce fichier)
+  2. AGENT_PROTOCOL.md
+  3. STARTUP_CHECKLIST.md
+  4. NEXT_ACTION.md
+  5. STATE_PROJECT.md
+  6. RULES.md
+  7. ARCHITECTURE.md
+  8. HISTORY.md
+  9. DEPLOY_GUIDE.md
+  10. TASKS.md
+  11. CHECKLIST_MASTER.md (si présent)
+
+4.2 Vérifier accès :
+  - repo miroir public → DOIT fonctionner
+  - repo privé → utilisé uniquement pour pipeline
+
+4.3 Exécuter les 6 SCANS obligatoires :
+  - accès repos
+  - lecture docs
+  - cohérence commits
+  - workflows présents
+  - secrets
+  - NEXT_ACTION
+
+4.4 Produire le RAPPORT INITIAL strict.
+
+----------------------------------------------------------------------
+5. FORMAT DU RAPPORT INITIAL (OBLIGATOIRE)
+
+```text
+[PROTOCOL INITIAL REPORT – LEVEL RED]
+
+1. Private repo access: OK/NON
+2. Mirror repo access: OK/NON
+3. Docs loaded: <liste>
+4. Last commit (private): <hash>
+5. Last commit (mirror): <hash>
+6. Sync status: SYNC / OUTDATED
+7. NEXT ACTION: <copie exacte>
+
+QUESTION: Souhaites-tu valider l’exécution de l’étape 1 ?
+```
+
+Après ce rapport, l’agent doit STOP.
+
+----------------------------------------------------------------------
+6. RÈGLES RAPIDES POUR TOUS LES AGENTS
+
+✔ Une seule action par étape  
+✔ Toujours demander validation  
+✔ Fournir fichiers complets  
+✔ Proposer commandes git  
+✔ Ne jamais modifier build/web  
+✔ Ne jamais inventer une action  
+✔ Suivre strictement NEXT_ACTION  
 
-Ce document définit le comportement obligatoire de tous les agents GPT travaillant sur ce projet.
-Chaque réponse doit se conformer strictement aux règles suivantes.
+----------------------------------------------------------------------
+7. ERREURS CRITIQUES À ÉVITER
 
-1. 🔐 Accès GitHub — Procédure obligatoire
+❌ commencer par répondre sans SCANS  
+❌ ignorer le miroir public  
+❌ sauter NEXT_ACTION  
+❌ proposer plusieurs actions  
+❌ produire un résumé inventé  
+❌ modifier des workflows sans accord  
+❌ oublier mise à jour des docs  
 
-Avant toute analyse ou réponse, l’agent doit :
+----------------------------------------------------------------------
+8. PASSERELLE VERS LE PROTOCOLE COMPLET
 
-✔ 1.1 Vérifier si le dépôt est public
+Après lecture de ce fichier, l’agent doit ouvrir :
 
-URL :
-https://github.com/sanadidari/empreinte_verif
+➡️ **AGENT_PROTOCOL.md**  
+C’est le cœur du système militaire.
 
-Si public, lire directement les fichiers /docs.
-
-✔ 1.2 Si le dépôt est privé → tester lecture RAW
-
-Exemple :
-
-https://raw.githubusercontent.com/sanadidari/empreinte_verif/main/docs/AGENT_START.md
-https://raw.githubusercontent.com/sanadidari/empreinte_verif/main/docs/STATE_PROJECT.md
-https://raw.githubusercontent.com/sanadidari/empreinte_verif/main/docs/NEXT_ACTION.md
-
-✔ 1.3 Si lecture RAW échoue → demander une des solutions :
-
-Rendre temporairement public
-
-Fournir liens RAW publics
-
-Copier-coller les fichiers
-
-Créer un dépôt public “empreinte_verif_docs”
-
-❌ L’agent ne doit jamais prétendre avoir lu un fichier qu’il n’a pas reçu.
-2. 📚 Lecture obligatoire des fichiers /docs
-
-Dans cet ordre précis :
-
-AGENT_START.md
-
-AGENT_STARTUP_CHECKLIST.md
-
-NEXT_ACTION.md
-
-STATE_PROJECT.md
-
-RULES.md
-
-ARCHITECTURE.md
-
-HISTORY.md
-
-DEPLOY_GUIDE_VERCEL.md
-
-TASKS.md
-
-CHECKLIST_MASTER.md (si présent)
-
-3. 🧠 RÈGLE D’OR — PRO MODE STRICT
-L’agent doit toujours :
-
-Être précis
-
-Structuré
-
-Sans blabla inutile
-
-Sans invention
-
-Sans suppositions
-
-Avec transparence totale
-
-Avec justification claire
-
-Avec un ton professionnel
-
-L’agent doit toujours suivre :
-
-Proposer → Valider → Exécuter → Mettre à jour
-
-❌ Une seule modification par étape
-❌ Pas d’action sans validation utilisateur
-❌ Pas d’exécution anticipée
-4. 🧩 Vérifications du projet (obligatoires)
-
-L’agent doit vérifier :
-
-Présence de pubspec.yaml
-
-Présence du dossier lib/
-
-Présence du dossier web/
-
-Présence ou absence de vercel.json
-
-La branche main
-
-L’état du dernier commit
-
-La cohérence Flutter Web → Vercel
-
-5. 🚀 Première réponse obligatoire de l’agent
-
-Après lecture de tous les fichiers /docs et du repo GitHub, la première réponse doit contenir :
-
-Ce que l’agent a compris du projet
-
-Ce que l’agent a compris de l’état actuel (STATE_PROJECT.md)
-
-La prochaine action réelle (NEXT_ACTION.md)
-
-Le plan étape 1 uniquement
-
-Une demande explicite :
-
-“Veux-tu valider l’étape 1 ?”
-
-Si l’accès GitHub échoue, la première réponse doit être :
-
-Indication du problème
-
-Raison technique
-
-Demande de solution (public/raw/coller docs)
-
-6. 📑 Mise à jour des documents
-
-Après chaque action validée, l’agent doit mettre à jour :
-
-STATE_PROJECT.md
-
-TASKS.md
-
-Le fichier concerné par l’action
-
-Chaque mise à jour doit être fournie sous forme :
-
-Fichier complet prêt à être copié
-
-Commandes git à exécuter
-
-Message de commit recommandé
-
-7. 📌 Exemples de comportements interdits
-
-“Je suppose que…”
-
-“Je pense que le repo contient…”
-
-“Voici l’analyse sans avoir lu les docs…”
-
-Faire plusieurs actions dans une seule réponse
-
-8. 🧾 Journalisation
-
-L’agent doit indiquer :
-
-Quels fichiers il a lus
-
-Leur source : GitHub ou texte collé
-
-Timestamp de lecture
-
-Notes éventuelles
-
-✔ FIN DU FICHIER
+----------------------------------------------------------------------
+FIN DU FICHIER — AGENT_START.md v1.0 (FORMAT 80 COLONNES)

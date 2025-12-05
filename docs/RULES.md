@@ -1,195 +1,155 @@
-📄 RULES.md — Version PRO
-🧠 RÈGLES OFFICIELLES — Agents GPT
-
-Projet : Sanad Idari — empreinte_verif
-
-Ces règles sont obligatoires, non négociables, et supersèdent toutes les autres instructions.
-
-1. 🔵 RÈGLE D’OR — PRO MODE OBLIGATOIRE
-
-L’agent doit toujours :
-
-Être précis
-
-Structuré
-
-Professionnel
-
-Sans blabla inutile
-
-Sans invention
-
-Basé uniquement sur fichiers /docs + GitHub
-
-Avec transparence totale sur ce qu’il a lu ou pas
-
-Une seule action par réponse
-
-❌ Interdits :
-
-Supposer sans vérifier
-
-Deviner
-
-Imaginer du code
-
-Répondre avant lecture des docs
-
-Faire plusieurs actions dans une seule réponse
-
-2. 🔵 Accès GitHub — Règle absolue
-
-L’agent doit absolument vérifier l’accès GitHub avant toute réponse technique.
-
-✔ Dépôt public ?
-
-→ Lire directement.
-
-✔ Dépôt privé ?
-
-→ Tester URLs RAW :
-
-https://raw.githubusercontent.com/sanadidari/empreinte_verif/main/docs/AGENT_START.md
-
-❌ Inviter un bot GitHub
-
-Un agent GPT :
-
-ne peut pas accepter l’invitation
-
-ne peut pas se connecter à GitHub
-
-ne peut pas utiliser un token
-
-ne peut jamais accéder à un repo privé
-
-Si accès impossible :
-
-→ Demander une des solutions suivantes :
-
-rendre public
-
-fournir liens RAW
-
-copier-coller fichiers
-
-créer empreinte_verif_docs public
-
-3. 🔵 Vérification obligatoire avant action
-
-L’agent doit vérifier :
-
-AGENT_START.md lu
-
-tous les fichiers /docs lus
-
-pubspec.yaml présent
-
-lib/ présent
-
-web/ présent
-
-compatibilité Flutter Web
-
-état du repo GitHub (main)
-
-présence ou absence de vercel.json
-
-4. 🔵 Workflow obligatoire
-
-Chaque action doit suivre :
-
-1. Proposition
-
-→ l’agent propose UNE action unique
-
-2. Validation utilisateur
-
-→ l’agent attend explicitement « oui je valide »
-
-3. Exécution
-
-→ l’agent fournit le fichier complet modifié
-
-4. Mise à jour /docs
-
-→ STATE_PROJECT.md
-→ TASKS.md
-→ fichier impacté
-
-5. 🔵 Déploiement — Règles strictes
-
-Toutes les opérations de déploiement doivent suivre :
-
-✔ Pipeline :
-
-GitHub → Vercel
-
-✔ Build :
-flutter build web --release
-
-✔ Output :
-build/web
-
-✔ Framework :
-
-Other
-
-❌ Interdits :
-
-déploiement manuel FTP
-
-WinSCP
-
-VPS HostPapa
-
-scripts locaux non documentés
-
-watch dog local
-
-6. 🔵 Conditions d’arrêt
-
-L’agent doit STOPPER immédiatement si :
-
-un fichier /docs manque
-
-accès GitHub impossible
-
-Next Action incohérente
-
-état du projet contradictoire
-
-le code Flutter n’a pas été vérifié
-
-Et doit demander une correction ou clarification.
-
-7. 🔵 Transparence obligatoire
-
-L’agent doit indiquer :
-
-les fichiers lus
-
-leur source (GitHub/RAW/collé)
-
-timestamp de lecture
-
-toute limitation rencontrée
-
-8. 🔵 Exemples — Bon vs Mauvais comportement
-✔ BON :
-
-"J’ai lu AGENT_START.md (source : RAW GitHub), voici la prochaine action…"
-
-"Je ne peux pas accéder à GitHub, merci de rendre le dépôt public."
-
-"Je propose UNE action : mettre à jour NEXT_ACTION.md."
-
-❌ MAUVAIS :
-
-"Je pense que…"
-"Je suppose…"
-"J’invente…"
-"Je fais trois actions dans un message."
-"Je modifie sans validation."
-
-✔ FIN DU FICHIER
+## RULES.md — MILITARY OPERATING RULES (MOR-2)
+Projet : empreinte_verif
+Classification : STRICT — ZERO-ERROR — NON-NÉGOCIABLE
+
+----------------------------------------------------------------------
+1. RÈGLE D’OR — PRO MODE STRICT
+
+Un agent GPT travaillant sur ce projet doit :
+  - répondre avec précision et concision
+  - appliquer les procédures militaires
+  - utiliser exclusivement :
+      • les fichiers /docs
+      • le repo miroir public (source unique)
+      • le repo privé pour vérifications
+  - refuser toute supposition
+  - refuser toute action non validée
+  - s'arrêter après chaque étape
+
+Interdit absolument :
+  - inventer
+  - deviner sans preuve
+  - exécuter plusieurs actions à la fois
+  - travailler avant les SCANS
+  - sauter NEXT_ACTION
+  - modifier build/web/
+
+----------------------------------------------------------------------
+2. ACCÈS GITHUB — LOI ABSOLUE
+
+2.1 Repo privé
+  L’agent doit vérifier :
+    - accessibilité
+    - dossiers /lib, /web, /docs
+    - workflows GitHub
+    - RAW disponibles
+
+2.2 Repo miroir (SOURCE UNIQUE)
+  MUST READ = Miroir uniquement.
+  Vérifier :
+    - accessibilité
+    - dernier commit
+    - cohérence privé/miroir
+    - statut SYNC / OUTDATED
+
+2.3 Si échec d’accès
+  L’agent doit obligatoirement demander :
+    - rendre /docs public
+    - fournir RAW
+    - copier/coller contenu
+  Aucune autre option n’est autorisée.
+
+----------------------------------------------------------------------
+3. RÉGIME DE TRAVAIL — UNE SEULE ACTION PAR ÉTAPE
+
+Chaque séquence suit ce cycle :
+  1. proposer action
+  2. recevoir validation
+  3. exécuter l'action unique
+  4. fournir fichier modifié complet
+  5. proposer commandes git :
+        git add .
+        git commit -m "<message>"
+        git push
+  6. mettre à jour :
+        - STATE_PROJECT.md
+        - TASKS.md
+        - le fichier modifié
+
+STOP obligatoire après l’étape.
+
+----------------------------------------------------------------------
+4. LECTURE OBLIGATOIRE DES DOCS
+
+Ordre strict :
+  1. AGENT_PROTOCOL.md
+  2. STARTUP_CHECKLIST.md
+  3. NEXT_ACTION.md
+  4. STATE_PROJECT.md
+  5. RULES.md (ce fichier)
+  6. ARCHITECTURE.md
+  7. HISTORY.md
+  8. DEPLOY_GUIDE.md
+  9. TASKS.md
+  10. CHECKLIST_MASTER.md (si présent)
+
+L’agent doit indiquer explicitement les fichiers lus.
+
+----------------------------------------------------------------------
+5. VÉRIFICATIONS OBLIGATOIRES
+
+5.1 Structure Flutter
+  - pubspec.yaml
+  - lib/
+  - web/
+  - index.html
+  - assets
+  - scripts Flutter Web
+
+5.2 Infrastructure
+  - workflows GitHub présents
+  - secrets VERCEL_TOKEN + MIRROR_DEPLOY_KEY
+  - vercel.json correct
+
+5.3 Domaine & DNS
+  - qrpruf.sanadidari.com
+  - CNAME actif
+  - SSL actif
+
+----------------------------------------------------------------------
+6. INTERDICTIONS ABSOLUES
+
+❌ modifier plusieurs fichiers simultanément  
+❌ modifier build/web  
+❌ écrire du code inventé  
+❌ corriger sans validation  
+❌ sauter une étape du protocole  
+❌ proposer une action hors NEXT_ACTION  
+❌ continuer si un fichier manque  
+❌ ignorer le miroir (source unique)
+
+----------------------------------------------------------------------
+7. RAPPORT INITIAL — FORMAT OBLIGATOIRE
+
+[PROTOCOL INITIAL REPORT – LEVEL RED]
+1. Private repo access: OK/NON
+2. Mirror repo access: OK/NON
+3. Docs loaded: <liste>
+4. Last commit (private): <hash>
+5. Last commit (mirror): <hash>
+6. Sync status: SYNC / OUTDATED
+7. NEXT ACTION: <copie exacte>
+
+QUESTION: Souhaites-tu valider l’exécution de l’étape 1 ?
+
+STOP obligatoire.
+
+----------------------------------------------------------------------
+8. CONDITIONS D’ARRÊT
+
+L’agent doit stopper immédiatement si :
+  - un fichier /docs manque
+  - accès GitHub cassé
+  - workflow incorrect
+  - secrets manquants
+  - incohérence NEXT_ACTION
+  - miroir inaccessible
+
+----------------------------------------------------------------------
+9. RÈGLE SUPRÊME
+
+La documentation prime sur toutes les demandes utilisateur.
+Seule exception : une réécriture validée par l’utilisateur.
+
+----------------------------------------------------------------------
+FIN DU FICHIER — RULES.md v2.0 (FORMAT 80 COLONNES)

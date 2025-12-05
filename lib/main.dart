@@ -33,69 +33,56 @@ class _LoginPageState extends State<LoginPage> {
   final LocalAuthentication auth = LocalAuthentication();
   bool _isChecking = false;
 
-  /// Détecte si on est sur Flutter Web
   bool _isWeb() {
     try {
-      return identical(0, 0.0); 
+      return identical(0, 0.0);
     } catch (_) {
       return false;
     }
   }
 
-  /// Ouvre un lien externe
   Future<void> openLink(String url) async {
     final Uri uri = Uri.parse(url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  /// Lien vers ta page d'installation complète
   final String installUrl =
       "https://sanadidari.com/testftp/setup/setup.html";
 
-  /// Tentative d'ouverture de l'app Android (si installée)
+  /// Nouveau PACKAGE FIXÉ
   Future<bool> tryOpenAndroidApp() async {
     final Uri uri = Uri.parse(
-        "intent://empreinte#Intent;scheme=empreinteverif;package=com.example.empreinte_verif;end");
+        "intent://empreinte#Intent;scheme=empreinteverif;package=com.sanadidari.empreinte;end");
 
     try {
       bool ok = await launchUrl(uri,
           mode: LaunchMode.externalApplication, webOnlyWindowName: "_self");
-
       return ok;
     } catch (_) {
       return false;
     }
   }
 
-  /// Fonction principale biométrie / redirection
   Future<void> _startBiometric() async {
     setState(() => _isChecking = true);
 
     try {
-      // 🔹 1 — CAS WEB → on ouvre install.html
       if (_isWeb()) {
         await openLink(installUrl);
         return;
       }
 
-      // 🔹 2 — CAS ANDROID : vérifier si l'app Android est déjà installée
       bool appInstalled = await tryOpenAndroidApp();
-      if (appInstalled) {
-        // L'app Android existe → pas besoin de télécharger
-        return;
-      }
+      if (appInstalled) return;
 
-      // 🔹 3 — Vérifier si biométrie supportée
       bool canCheck = await auth.canCheckBiometrics;
       bool supported = await auth.isDeviceSupported();
 
       if (!canCheck || !supported) {
-        // Pas de biométrie → redirection installation APK
         await openLink(installUrl);
         return;
       }
 
-      // 🔹 4 — Tentative d'auth biométrique
       bool didAuth = await auth.authenticate(
         localizedReason: "Veuillez scanner votre empreinte",
         options: const AuthenticationOptions(
@@ -106,7 +93,6 @@ class _LoginPageState extends State<LoginPage> {
 
       if (didAuth) {
         if (!mounted) return;
-
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const PageProjets()),
@@ -115,7 +101,6 @@ class _LoginPageState extends State<LoginPage> {
         await openLink(installUrl);
       }
     } catch (e) {
-      // Toute erreur → installation
       await openLink(installUrl);
     }
 
@@ -135,8 +120,7 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: _isChecking ? null : _startBiometric,
               style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 backgroundColor: Colors.blue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -149,6 +133,24 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
             ),
+
+            // BOUTON DIAGNOSTIC
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                bool can = await auth.canCheckBiometrics;
+                bool sup = await auth.isDeviceSupported();
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Diagnostic"),
+                    content: Text("Biométrie supportée : $can\nDevice supporté : $sup"),
+                  ),
+                );
+              },
+              child: const Text("Diagnostic biométrie"),
+            ),
+
           ],
         ),
       ),
@@ -164,8 +166,7 @@ class PageProjets extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Projets de l'employé")),
       body: const Center(
-        child: Text("Liste des projets (à venir)",
-            style: TextStyle(fontSize: 18)),
+        child: Text("Liste des projets (à venir)", style: TextStyle(fontSize: 18)),
       ),
     );
   }

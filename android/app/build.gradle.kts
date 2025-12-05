@@ -8,19 +8,35 @@ plugins {
 
 android {
     namespace = "com.sanadidari.empreinte"
-    compileSdk = 36     // ← OBLIGATOIRE
+    compileSdk = 36
     buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "com.sanadidari.empreinte"
         minSdk = flutter.minSdkVersion
-        targetSdk = 36   // ← OBLIGATOIRE
+        targetSdk = 36
         versionCode = 100
         versionName = "1.0.0"
 
         multiDexEnabled = true
+
+        // 🔥 Support total pour Itel / UNISOC (armeabi-v7a + arm64)
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
+    // 🔥 Génère un APK universel compatible tous téléphones
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = true
+        }
+    }
+
+    // 🔑 Charge la configuration du keystore (signature)
     val keystoreProperties = Properties()
     val keystorePropertiesFile = rootProject.file("key.properties")
     if (keystorePropertiesFile.exists()) {

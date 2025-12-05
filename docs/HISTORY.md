@@ -1,105 +1,135 @@
-📄 HISTORY.md — Version PRO
-📘 Historique du Projet
+## HISTORY.md — OPERATIONAL HISTORY DOSSIER (OHD-2)
+Projet : empreinte_verif
+Classification : ARCHIVE — RÉFÉRENCE STRATÉGIQUE
 
-Sanad Idari — empreinte_verif
+----------------------------------------------------------------------
+1. OBJECTIF DU DOSSIER
 
-Ce document trace l’évolution chronologique du projet, les changements techniques, les migrations, les décisions importantes et les mises à jour du système PRO.
+Ce fichier documente l’historique complet et vérifié du projet
+empreinte_verif.  
+Aucune supposition.  
+Aucune omission.  
+Il sert pour :
+  - audit technique
+  - diagnostic infrastructure
+  - continuité inter-agents GPT
+  - analyse des incidents
+  - traçabilité long terme
 
-📅 2025-12-01 → 2025-12-04 — Phase HostPapa (abandon)
-🔴 Problèmes rencontrés :
+----------------------------------------------------------------------
+2. HISTORIQUE CHRONOLOGIQUE
 
-Accès SSH très limité
+🟥 2025-12-01 — Abandon définitif de HostPapa
+Problèmes :
+  - FTP instable
+  - SSH verrouillé
+  - incompatibilité Flutter Web
+  - hosting non adapté SPA
+Actions :
+  - backup manuel
+  - désactivation scripts locaux
+  - décision stratégique : migration Vercel
+Résultat :
+  ✔ fin de HostPapa
 
-Blocages WinSCP
+----------------------------------------------------------------------
+🟦 2025-12-02 — Création base Flutter Web
+Actions :
+  - initialisation projet Flutter
+  - création UI scanner
+  - gestion assets
+  - tests build Web
+Résultat :
+  ✔ application fonctionnelle localement
 
-Restrictions de déploiement
+----------------------------------------------------------------------
+🟩 2025-12-03 — Mise en place documentation PRO
+Actions :
+  - création /docs
+  - normalisation style militaire
+  - centralisation instructions
+Résultat :
+  ✔ documentation opérationnelle
 
-Incompatibilité Flutter Web / environnement HostPapa
+----------------------------------------------------------------------
+🟧 2025-12-04 — Migration Vercel + Corrections
+Actions :
+  - création projet Vercel
+  - configuration DNS
+  - ajout vercel.json
+  - correction routing SPA
+  - tests navigateur + SSL
+Résultat :
+  ✔ déploiement fonctionnel
 
-Hébergement non adapté à SPA modernes
+----------------------------------------------------------------------
+🟪 2025-12-04 — Installation CI/CD
+Actions :
+  - build_web.yml
+  - installation Flutter dans actions
+  - setup VERCEL_TOKEN
+Résultat :
+  ✔ build + deploy automatisés
 
-🔶 Décisions :
+----------------------------------------------------------------------
+🟥 2025-12-05 — Mise en place système miroir GitHub
+Enjeux :
+  agents GPT doivent accéder code → miroir public
+Actions :
+  - création clé SSH miroir
+  - ajout clé publique dans miroir
+  - ajout clé privée dans secrets
+  - création workflow mirror.yml
+  - tests synchronisation
+Résultat :
+  ✔ miroir opérationnel
+  ✔ agents ont accès permanent
 
-Abandon définitif de HostPapa
+----------------------------------------------------------------------
+🟦 2025-12-06 — Passage en MODE MILITAIRE
+Actions :
+  - refonte complète /docs
+  - ajout AGENT_PROTOCOL.md
+  - ajout règles strictes (1 action / étape)
+  - mise à jour STARTUP_CHECKLIST
+  - réécriture RULES
+  - mise en place NEXT_ACTION militaire
+Résultat :
+  ✔ système documentaire PRO MODE stable
 
-Recherche d’un hébergement moderne
+----------------------------------------------------------------------
+🟩 2025-12-07 — Documentation militaire v2 (80 colonnes)
+Actions :
+  - refactor complet fichiers
+  - format compact uniforme
+  - harmonisation protocole
+Résultat :
+  ✔ documentation finale cohérente
 
-Validation de Vercel comme plateforme cible
+----------------------------------------------------------------------
+3. STATUT ACTUEL — LIVE STATUS
 
-📅 2025-12-04 — Migration vers Vercel
-🔧 Actions :
+Pipeline :
+  - CI/CD fonctionnel
+  - miroir opérationnel
+  - déploiement Vercel stable
 
-Suppression complète des anciens scripts PowerShell
+Code Flutter :
+  - stable /lib et /web
 
-Suppression du système Watchdog
+Documentation :
+  - version militaire v2 opérationnelle
 
-Nettoyage du projet
+----------------------------------------------------------------------
+4. PROCHAINES ENTRÉES (À AJOUTER)
 
-Création d’une structure propre
+À ajouter lors de réalisation :
+  - premier déploiement CI complet
+  - activation API backend
+  - version mobile
+  - tests utilisateurs
+  - optimisation SEO
+  - versioning application
 
-Mise en place du pipeline GitHub → Vercel
-
-🔵 Résultat :
-
-Infrastructure modernisée
-
-Pipeline stable
-
-Projet prêt pour Flutter Web
-
-📅 2025-12-05 — Système PRO Agents GPT
-🔧 Actions :
-
-Mise en place du dossier /docs
-
-Ajout des règles : Règle d’Or, PRO MODE
-
-Création des fichiers de gouvernance
-
-Normalisation du workflow agents GPT
-
-Stabilisation de la documentation
-
-🔵 Résultat :
-
-Documentation centralisée
-
-Agents GPT opérationnels
-
-Projet structuré pour long terme
-
-📅 2025-12-06 — Préparation du déploiement Vercel
-🔧 Actions :
-
-Vérification GitHub (branche main → OK)
-
-Vérification structure Flutter
-
-Création du guide Vercel préliminaire
-
-Analyse du pipeline Flutter Web
-
-🟢 État :
-
-Code prêt
-
-Docs prêtes
-
-Pipeline prêt
-
-Next Action définie : Import → Build → Deploy
-
-📅 À VENIR — Après premier déploiement
-🔜 Tâches prévues :
-
-SEO Flutter Web
-
-Documentation finale du domaine
-
-Optimisation assets / compression
-
-Amélioration CI/CD Vercel (optionnel)
-
-Ajout versioning releases
-
-✔ FIN DU FICHIER
+----------------------------------------------------------------------
+FIN DU FICHIER — HISTORY.md v2.0 (FORMAT 80 COLONNES)
