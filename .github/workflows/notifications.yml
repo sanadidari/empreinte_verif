@@ -1,0 +1,126 @@
+name: Notifications — Slack & Email Alerts
+
+on:
+  workflow_run:
+    workflows:
+      - "CI / CD — Flutter Web → Vercel"
+      - "Auto Deploy — Flutter Web → Vercel"
+      - "Rollback — Vercel Auto-Restore"
+      - "Post-Deploy Tests — Flutter Web on Vercel"
+      - "Healthcheck — Production Monitor"
+      - "Agent Heartbeat — Auto Diagnostic System"
+      - "Agent Heartbeat — Auto Diagnostic" # tolerant for naming variants
+    types:
+      - completed
+  workflow_dispatch:
+
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
+  SMTP_SERVER: ${{ secrets.SMTP_SERVER || '' }}
+  SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+  SMTP_USER: ${{ secrets.SMTP_USER || '' }}
+  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD || '' }}
+  EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO || '' }}
+  EMAIL_FROM: ${{ secrets.NOTIFY_EMAIL_FROM || 'automation@system.local' }}
+
+jobs:
+  notify:
+    name: Send notifications (Slack + Email)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout (for context)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gather run info
+        run: |
+          echo "Collecting context..."
+          EVENT_FILE="$GITHUB_EVENT_PATH"
+          WORKFLOW_NAME="${{ github.event.workflow_run?.name || github.workflow }}"
+          CONCLUSION="${{ github.event.workflow_run?.conclusion || 'unknown' }}"
+          RUN_ID="${{ github.event.workflow_run?.id || github.run_id }}"
+          COMMIT="${GITHUB_SHA}"
+          echo "workflow_name=$WORKFLOW_NAME" >> run_info.txt
+          echo "conclusion=$CONCLUSION" >> run_info.txt
+          echo "run_id=$RUN_ID" >> run_info.txt
+          echo "commit=$COMMIT" >> run_info.txt
+          cat run_info.txt
+
+      - name: Build notification payload
+        id: payload
+        run: |
+          WF="${{ github.event.workflow_run.name || github.workflow }}"
+          CONCL="${{ github.event.workflow_run.conclusion || 'unknown' }}"
+          RUN="${{ github.event.workflow_run.id || github.run_id }}"
+          URL="https://github.com/${{ github.repository }}/actions/runs/${RUN}"
+          SHORT_COMMIT="$(git rev-parse --short ${GITHUB_SHA} || echo unknown)"
+          TITLE="Automation: ${WF} — ${CONCL}"
+          TEXT="Workflow *${WF}* finished with status *${CONCL}*.\nCommit: \`${SHORT_COMMIT}\`\nRun: ${URL}"
+          # JSON-safe payload for Slack
+          SLACK_PAYLOAD=$(jq -n --arg t "$TITLE" --arg txt "$TEXT" '{text: ($t + "\n\n" + $txt)}')
+          echo "slack=$SLACK_PAYLOAD" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "text=$TEXT" >> $GITHUB_OUTPUT
+          echo "run_url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Send Slack notification (if webhook configured)
+        if: env.SLACK_WEBHOOK_URL != ''
+        run: |
+          echo "Sending Slack notification..."
+          PAYLOAD="${{ steps.payload.outputs.slack }}"
+          # send
+          curl -s -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "${SLACK_WEBHOOK_URL}" || echo "Slack POST failed"
+
+      - name: Prepare msmtp config (if SMTP configured)
+        if: env.SMTP_SERVER != '' && env.SMTP_USER != '' && env.SMTP_PASSWORD != '' && env.EMAIL_TO != ''
+        run: |
+          echo "Setting up msmtp for sending email..."
+          sudo apt-get update -y
+          sudo apt-get install -y msmtp-mta mailutils ca-certificates || true
+          cat > /tmp/msmtp.conf <<EOF
+defaults
+auth           on
+tls            on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        ~/.msmtp.log
+
+account default
+host ${SMTP_SERVER}
+port ${SMTP_PORT}
+user ${SMTP_USER}
+password ${SMTP_PASSWORD}
+from ${EMAIL_FROM}
+EOF
+          chmod 600 /tmp/msmtp.conf
+          export MSMTP_CONF=/tmp/msmtp.conf
+          echo "msmtp config written"
+
+      - name: Send Email notification (if SMTP configured)
+        if: env.SMTP_SERVER != '' && env.SMTP_USER != '' && env.SMTP_PASSWORD != '' && env.EMAIL_TO != ''
+        run: |
+          SUBJECT="${{ steps.payload.outputs.title }}"
+          BODY="${{ steps.payload.outputs.text }}"
+          echo -e "$BODY" > /tmp/notify_body.txt
+          # send via msmtp using configured file
+          msmtp --file=/tmp/msmtp.conf -- ${EMAIL_TO} < /tmp/notify_body.txt || (echo "Email send failed" && exit 0)
+
+      - name: Fallback: Create GitHub Issue on failure
+        if: ${{ github.event.workflow_run.conclusion != 'success' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = `${{ steps.payload.outputs.title }}`;
+            const body = `Automated notification: ${{ steps.payload.outputs.text }}\n\nRun: ${{ steps.payload.outputs.run_url }}`;
+            await github.rest.issues.create({
+              ...context.repo,
+              title,
+              body,
+              labels: ["automation","alert"]
+            });
+
+      - name: Done
+        run: echo "Notifications step completed."
