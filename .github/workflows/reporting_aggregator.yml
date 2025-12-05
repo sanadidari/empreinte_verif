@@ -1,0 +1,153 @@
+name: Reporting Aggregator — Logs & Alerts
+
+# Trigger when main automation workflows complete (success or failure)
+on:
+  workflow_run:
+    workflows:
+      - "CI / CD — Flutter Web → Vercel"
+      - "Auto Deploy — Flutter Web → Vercel"
+      - "Rollback — Vercel Auto-Restore"
+      - "Post-Deploy Tests — Flutter Web on Vercel"
+      - "Healthcheck — Production Monitor"
+      - "Agent Heartbeat — Auto Diagnostic System"
+    types:
+      - completed
+  workflow_dispatch:
+
+env:
+  AGGREGATOR_REPORT: "/tmp/aggregator_report.md"
+  WEBHOOK_URL: ${{ secrets.LOGGING_WEBHOOK_URL || '' }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN || '' }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN || '' }}
+
+jobs:
+  aggregate_and_report:
+    name: Aggregate logs & create report
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository (shallow ok)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gather workflow run context
+        run: |
+          echo "Gathering workflow run context..."
+          echo "workflow: $GITHUB_WORKFLOW"
+          echo "event: $GITHUB_EVENT_NAME"
+          jq '.' "$GITHUB_EVENT_PATH" > /tmp/event.json || true
+          echo "GITHUB_SHA: $GITHUB_SHA" > /tmp/agg_meta.txt
+          echo "GITHUB_REF: $GITHUB_REF" >> /tmp/agg_meta.txt
+          echo "GITHUB_RUN_ID: $GITHUB_RUN_ID" >> /tmp/agg_meta.txt
+          echo "WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion || 'unknown' }}" >> /tmp/agg_meta.txt
+
+      - name: Download related artifacts (if available)
+        run: |
+          mkdir -p /tmp/agg_artifacts
+          echo "Attempting to download artifacts for the triggering workflow run..."
+          # Use GitHub API to list artifacts for the workflow run that triggered this job
+          WORKFLOW_RUN_ID="${{ github.event.workflow_run.id || '' }}"
+          if [ -n "$WORKFLOW_RUN_ID" ]; then
+            echo "Workflow run id: $WORKFLOW_RUN_ID"
+            TOKEN="${{ secrets.GITHUB_TOKEN }}"
+            ART_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${WORKFLOW_RUN_ID}/artifacts"
+            curl -s -H "Authorization: token $TOKEN" "$ART_URL" > /tmp/artifacts.json || true
+            cat /tmp/artifacts.json
+            # Try to download each artifact (best-effort)
+            jq -r '.artifacts[]?.archive_download_url' /tmp/artifacts.json | while read -r url; do
+              if [ -n "$url" ]; then
+                echo "Downloading artifact: $url"
+                curl -sL -H "Authorization: token $TOKEN" -o /tmp/agg_artifacts/artifact.zip "$url" && unzip -o /tmp/agg_artifacts/artifact.zip -d /tmp/agg_artifacts || true
+              fi
+            done || true
+          else
+            echo "No workflow run id found in event payload."
+          fi
+
+      - name: Collect logs from repository (best-effort candidates)
+        run: |
+          mkdir -p /tmp/agg_logs
+          # common names we created earlier
+          for f in build/web/main.dart.js vercel_output.txt lint_report.md flutter_analyze.txt /tmp/resp.html sync_report.md deployment-check-result || true; do
+            if [ -f "$f" ]; then
+              cp -v "$f" /tmp/agg_logs/ || true
+            fi
+          done
+          # also include any artifacts downloaded
+          cp -r /tmp/agg_artifacts/* /tmp/agg_logs/ || true
+          ls -la /tmp/agg_logs || true
+
+      - name: Build aggregator report
+        run: |
+          echo "# AGGREGATOR REPORT" > $AGGREGATOR_REPORT
+          echo "" >> $AGGREGATOR_REPORT
+          echo "Repository: $GITHUB_REPOSITORY" >> $AGGREGATOR_REPORT
+          echo "Trigger Workflow: $GITHUB_WORKFLOW" >> $AGGREGATOR_REPORT
+          echo "Event: $GITHUB_EVENT_NAME" >> $AGGREGATOR_REPORT
+          echo "Run ID: $GITHUB_RUN_ID" >> $AGGREGATOR_REPORT
+          echo "Commit: $GITHUB_SHA" >> $AGGREGATOR_REPORT
+          echo "" >> $AGGREGATOR_REPORT
+          echo "## Conclusion" >> $AGGREGATOR_REPORT
+          echo "${{ github.event.workflow_run.conclusion || 'unknown' }}" >> $AGGREGATOR_REPORT
+          echo "" >> $AGGREGATOR_REPORT
+          echo "## Meta" >> $AGGREGATOR_REPORT
+          cat /tmp/agg_meta.txt >> $AGGREGATOR_REPORT || true
+          echo "" >> $AGGREGATOR_REPORT
+          echo "## Collected logs (list)" >> $AGGREGATOR_REPORT
+          ls -la /tmp/agg_logs >> $AGGREGATOR_REPORT || true
+          echo "" >> $AGGREGATOR_REPORT
+          echo "## Quick summary of error keywords (in logs)" >> $AGGREGATOR_REPORT
+          grep -iE "error|exception|fail|panic|traceback|404" -R /tmp/agg_logs || true
+          echo "" >> $AGGREGATOR_REPORT
+          echo "## Artifact links (uploaded by workflow)" >> $AGGREGATOR_REPORT
+          echo "- aggregator_report.md (this file)" >> $AGGREGATOR_REPORT
+
+      - name: Upload aggregator report
+        uses: actions/upload-artifact@v4
+        with:
+          name: aggregator-report
+          path: |
+            $AGGREGATOR_REPORT
+            /tmp/agg_logs
+
+      - name: Create GitHub Issue on failure (conclusion != success)
+        if: ${{ github.event.workflow_run.conclusion != 'success' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/aggregator_report.md', 'utf8') || 'Aggregator report';
+            const issue = await github.rest.issues.create({
+              ...context.repo,
+              title: `🚨 Automation Failure — ${context.payload.workflow_run?.name || 'workflow' }`,
+              body: body + "\n\nArtifacts available in workflow run artifacts.",
+              labels: ["automation", "incident"]
+            });
+            return issue.number;
+
+      - name: Send payload to external webhook (if configured)
+        if: ${{ env.WEBHOOK_URL != '' }}
+        run: |
+          echo "Sending aggregator summary to external webhook..."
+          PAYLOAD=$(jq -n --arg repo "$GITHUB_REPOSITORY" --arg wf "$GITHUB_WORKFLOW" --arg run "${GITHUB_RUN_ID}" --arg concl "${{ github.event.workflow_run.conclusion || 'unknown' }}" '{repository:$repo, workflow:$wf, run_id:$run, conclusion:$concl}')
+          curl -s -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "${{ env.WEBHOOK_URL }}" || echo "Webhook POST failed"
+
+      - name: Optional: send minimal event to Sentry (if configured)
+        if: ${{ env.SENTRY_DSN != '' && env.SENTRY_AUTH_TOKEN != '' }}
+        run: |
+          echo "Sentry integration enabled — sending minimal event (best-effort)..."
+          # Build a minimal Sentry envelope — this is a lightweight best-effort event for alerting
+          ORG_PROJECT="${{ secrets.SENTRY_PROJECT || '' }}"
+          EVENT_PAYLOAD=$(jq -n --arg title "Automation event: ${GITHUB_WORKFLOW}" --arg body "conclusion=${{ github.event.workflow_run.conclusion || 'unknown' }}, run=${GITHUB_RUN_ID}" '{message:$title, extra:{info:$body}}')
+          # If sentry-cli is available, one would call: sentry-cli send-event -m "..." --auth-token ...
+          # We provide a minimal POST to a webhook-like endpoint if user maps SENTRY webhook URL to LOGGING_WEBHOOK_URL
+          echo "$EVENT_PAYLOAD" > /tmp/sentry_event.json
+          # Not attempting to call Sentry HTTP ingestion directly here (requires DSN/project specific format).
+          echo "Sentry event prepared at /tmp/sentry_event.json"
+
+      - name: Final status message
+        run: |
+          echo "Aggregator completed. Artifacts: aggregator-report (contains logs and summary)."
