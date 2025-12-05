@@ -1,0 +1,65 @@
+name: Rollback — Vercel Auto-Restore
+
+on:
+  workflow_run:
+    workflows: ["CI / CD — Flutter Web → Vercel"]
+    types:
+      - completed
+
+env:
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  rollback_if_failed:
+    name: Rollback Vercel deployment if CI/CD failed
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check CI/CD result
+        if: ${{ github.event.workflow_run.conclusion != 'success' }}
+        run: echo "CI/CD failed — starting rollback procedure..."
+
+      - name: Exit if CI/CD succeeded
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        run: |
+          echo "CI/CD was successful."
+          echo "Rollback is not needed."
+          exit 0
+
+      - name: Retrieve deployment list from Vercel
+        run: |
+          echo "Fetching latest Vercel deployments..."
+          curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&limit=5" \
+            -o deployments.json
+
+          echo "Deployments:"
+          cat deployments.json
+
+      - name: Select previous valid deployment
+        run: |
+          echo "Selecting previous successful deployment..."
+          PREV=$(jq -r '.deployments | map(select(.state == "READY")) | .[1].id' deployments.json)
+
+          if [ -z "$PREV" ] || [ "$PREV" = "null" ]; then
+            echo "ERROR: No previous valid deployment found."
+            exit 50
+          fi
+
+          echo "Previous valid deployment ID: $PREV" | tee rollback_id.txt
+
+      - name: Restore previous deployment
+        run: |
+          PREV=$(cat rollback_id.txt)
+          echo "Triggering rollback to deployment $PREV ..."
+
+          curl -X POST \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "https://api.vercel.com/v13/deployments/$PREV/restore"
+
+      - name: Upload rollback report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollba
