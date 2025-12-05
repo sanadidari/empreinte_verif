@@ -1,129 +1,145 @@
-## CHECKLIST_MASTER.md — MASTER CONTROL CHECKLIST (MCC-1)
-Projet : empreinte_verif
-Classification : STRICT — GLOBAL — ZERO-ERROR
+# CHECKLIST_MASTER.md — MACHINE CONTROL CHECKLIST v1.0
+project: empreinte_verif
+generated_by: machine
+version: 1.0
+last_update: auto
 
-Cette checklist regroupe les validations essentielles permettant de
-confirmer que le projet est :
-  - fonctionnel,
-  - synchronisé,
-  - sécurisé,
-  - conforme au protocole militaire.
+# ────────────────────────────────────────────────
+# SECTION 1 — PRESENCE DES FICHIERS CRITIQUES
+# ────────────────────────────────────────────────
+required_docs:
+  - docs/AGENT_START.md
+  - docs/NEXT_ACTION.md
+  - docs/DOCS_MANIFEST.yaml
+  - docs/DOCS_SCAN_INSTRUCTIONS.md
+  - docs/STATE_PROJECT.md
+  - docs/TASKS.md
+  - docs/AGENT_PROTOCOL.md
+  - docs/CHECKLIST_MASTER.md
 
-----------------------------------------------------------------------
-1. VALIDATION GITHUB
+required_workflows:
+  - .github/workflows/ci_cd.yml
+  - .github/workflows/rollback.yml
+  - .github/workflows/post_deploy_tests.yml
+  - .github/workflows/healthcheck.yml
+  - .github/workflows/agent_trigger.yml
+  - .github/workflows/agent_heartbeat.yml
 
-[ ] Repo privé accessible  
-[ ] Dossiers /lib, /web, /docs présents  
-[ ] Workflows présents  
-[ ] RAW accessible  
-[ ] Dernier commit récupéré  
+# ────────────────────────────────────────────────
+# SECTION 2 — VALIDATION DU MANIFEST
+# ────────────────────────────────────────────────
+manifest_rules:
+  must_contain:
+    - "manifest_version"
+    - "project:"
+    - "repo_private:"
+    - "repo_mirror:"
+    - "scan_order:"
+    - "file_patterns:"
+    - "scan_mode:"
 
-[ ] Repo miroir accessible  
-[ ] Docs présentes dans le miroir  
-[ ] Hash miroir ≈ hash privé  
-[ ] Statut : SYNC  
+# ────────────────────────────────────────────────
+# SECTION 3 — VERIFICATION DE LA STRUCTURE FLUTTER
+# ────────────────────────────────────────────────
+flutter_structure:
+  required_paths:
+    - pubspec.yaml
+    - lib/
+    - web/
+    - android/
+    - ios/
+    - .github/workflows/
 
-----------------------------------------------------------------------
-2. VALIDATION DOCUMENTATION
+web_required_files:
+  - web/index.html
+  - web/manifest.json
+  - web/flutter_bootstrap.js
+  - web/icons/
 
-[ ] AGENT_PROTOCOL.md lu  
-[ ] STARTUP_CHECKLIST.md lu  
-[ ] NEXT_ACTION.md lu  
-[ ] STATE_PROJECT.md lu  
-[ ] RULES.md lu  
-[ ] ARCHITECTURE.md lu  
-[ ] HISTORY.md lu  
-[ ] DEPLOY_GUIDE.md lu  
-[ ] TASKS.md lu  
-[ ] CHECKLIST_MASTER.md lu  
+flutter_build_targets:
+  - command: "flutter build web --release"
+    output: "build/web"
+    must_contain:
+      - index.html
+      - main.dart.js
+      - flutter_bootstrap.js
 
-Aucune action autorisée sans lecture complète des docs.
+# ────────────────────────────────────────────────
+# SECTION 4 — VERIFICATION DES SECRETS
+# ────────────────────────────────────────────────
+required_secrets:
+  - VERCEL_TOKEN
+  - VERCEL_ORG_ID
+  - VERCEL_PROJECT_ID
 
-----------------------------------------------------------------------
-3. VALIDATION SECRETS & SÉCURITÉ
+secret_validation_policy:
+  if_missing: "BLOCK_OPERATION"
+  message: "Secrets Vercel manquants — impossible de déployer."
 
-[ ] VERCEL_TOKEN présent  
-[ ] MIRROR_DEPLOY_KEY présent  
-[ ] Clé SSH non exposée  
-[ ] Aucun secret dans le repo  
-[ ] Pas de fichier sensible en clair  
+# ────────────────────────────────────────────────
+# SECTION 5 — VERIFICATION NEXT_ACTION
+# ────────────────────────────────────────────────
+next_action_rules:
+  must_have:
+    - "status:"
+    - "action_id:"
+    - "priority:"
+    - "execution_mode:"
+  blocking_status_values:
+    - BLOCKING
+    - HOLD
+    - MANUAL_REQUIRED
 
-----------------------------------------------------------------------
-4. VALIDATION CI/CD
+agent_behavior:
+  if_blocking: "STOP_AND_REPORT"
+  if_open: "CONTINUE_AUTOMATION"
 
-Workflow build_web.yml :
-  [ ] flutter clean  
-  [ ] flutter pub get  
-  [ ] flutter build web --release  
-  [ ] déploiement Vercel OK  
+# ────────────────────────────────────────────────
+# SECTION 6 — VERIFICATION DU SYSTEME DE TACHES
+# ────────────────────────────────────────────────
+tasks_validation:
+  required_fields:
+    - id
+    - title
+    - status
+    - priority
+    - auto_execute
+    - depends_on
+  allowed_status:
+    - PENDING
+    - IN_PROGRESS
+    - DONE
+    - BLOCKED
 
-Workflow mirror.yml :
-  [ ] SSH key install  
-  [ ] known_hosts configuré  
-  [ ] mirror remote correct  
-  [ ] push --force fonctionne  
+task_policy:
+  missing_task: "ERROR_REPORT"
+  invalid_status: "ERROR_REPORT"
 
-----------------------------------------------------------------------
-5. VALIDATION FLUTTER WEB
+# ────────────────────────────────────────────────
+# SECTION 7 — WORKFLOWS DIAGNOSTICS
+# ────────────────────────────────────────────────
+workflow_health_rules:
+  must_exist: true
+  require_recent_success: true
+  max_failures_allowed: 2
 
-[ ] lib/ stable  
-[ ] web/ complet  
-[ ] index.html correct  
-[ ] bootstrap OK  
-[ ] manifest.json OK  
-[ ] icons/ présents  
-[ ] assets/ présents  
-[ ] build local fonctionne  
+health_triggers:
+  - heartbeat
+  - post-deploy-tests
+  - ci_cd
+  - rollback
 
-----------------------------------------------------------------------
-6. VALIDATION VERCEL
+# ────────────────────────────────────────────────
+# SECTION 8 — RESULTAT FINAL
+# ────────────────────────────────────────────────
+result_mapping:
+  all_checks_passed: "READY_FOR_AUTOMATION"
+  some_warnings: "READY_WITH_WARNINGS"
+  blocking_error: "STOP_OPERATION"
 
-[ ] vercel.json présent  
-[ ] SPA fallback actif  
-[ ] main.dart.js chargé  
-[ ] aucune erreur console  
-[ ] pas d’assets manquants  
+exit_conditions:
+  on_error: "AGENT_STOPS_AND_REPORTS"
+  on_warning: "AGENT_CONTINUES_BUT_NOTES"
+  on_success: "AGENT_CONTINUES_FULLY"
 
-Domaines :
-  [ ] qrpruf.sanadidari.com OK  
-  [ ] www.qrpruf.sanadidari.com OK  
-  [ ] SSL actif  
-  [ ] CNAME correct  
-
-----------------------------------------------------------------------
-7. VALIDATION NEXT_ACTION
-
-[ ] Prochaine action identifiée  
-[ ] Aucun travail hors NEXT_ACTION  
-[ ] Étape en cours validée par utilisateur  
-[ ] Règle : une seule action à la fois  
-
-----------------------------------------------------------------------
-8. VALIDATION MISE À JOUR DES DOCS
-
-Après action exécutée :
-  [ ] fichier modifié mis à jour  
-  [ ] TASKS.md mis à jour  
-  [ ] STATE_PROJECT.md mis à jour  
-  [ ] HISTORY.md mis à jour (si nécessaire)  
-
-----------------------------------------------------------------------
-9. VALIDATION COMMITS
-
-Commandes obligatoires :
-  git add .
-  git commit -m "<message clair>"
-  git push
-
-[ ] Commit exécuté  
-[ ] Miroir auto-synchronisé  
-[ ] Déploiement trigger (si applicable)  
-
-----------------------------------------------------------------------
-
-- [ ] Verify Mode 4 enabled and workflows present (.github/workflows/auto_deploy.yml)
-- [ ] Verify self-diagnose, auto-repair, observer scripts are executable
-- [ ] Confirm VERCEL_TOKEN and MIRROR_DEPLOY_KEY in repo secrets
-
-----------------------------------------------------------------------
-FIN DU FICHIER — CHECKLIST_MASTER.md v1.0 (FORMAT 80 COLONNES)
+# END OF FILE
