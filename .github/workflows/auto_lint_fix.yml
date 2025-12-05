@@ -1,0 +1,85 @@
+name: Auto Lint & Fix — Flutter Code Maintainer
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "web/**"
+      - "pubspec.yaml"
+
+  schedule:
+    - cron: "0 3 * * *"  # Repair every night at 03:00 UTC
+
+  workflow_dispatch:
+
+jobs:
+  lint_and_fix:
+    name: Analyze, fix and commit Flutter code corrections
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Run Dart Analyzer
+        id: analyzer
+        run: |
+          echo "Running dart analyze..."
+          dart analyze || true
+
+      - name: Auto-fix Flutter issues
+        run: |
+          echo "Running flutter fix..."
+          flutter fix --apply || true
+
+      - name: Format Dart code
+        run: |
+          echo "Formatting Dart files..."
+          dart format lib web --line-length=120 || true
+
+      - name: Detect changes after fixes
+        id: git_changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit & push fixes
+        if: steps.git_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "auto-fix@system.local"
+          git config --local user.name "Flutter Auto Fix Bot"
+
+          git add lib web
+          git commit -m "style: auto-format + flutter fix applied"
+          git push origin main
+
+      - name: Generate Lint Report
+        run: |
+          echo "# LINT REPORT" > lint_report.md
+          echo "Timestamp: $(date)" >> lint_report.md
+          echo "Commit: $(git rev-parse HEAD)" >> lint_report.md
+          echo "" >> lint_report.md
+          echo "Analyzer Output:" >> lint_report.md
+          dart analyze >> lint_report.md || true
+
+      - name: Upload Lint Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-lint-report
+          path: lint_report.md
