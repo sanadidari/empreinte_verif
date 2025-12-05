@@ -1,63 +1,141 @@
-# AGENT_PROTOCOL.md — PROTOCOL MILITAIRE V3.0 (FULL INTELLIGENCE)
+# AGENT_PROTOCOL.md — MACHINE PROTOCOL v1.0
+project: empreinte_verif
+version: 1.0
+scope: full-automation
+status: active
+generated_by: machine
 
-Projet : empreinte_verif — Niveau : STRICT / ZERO-ERROR / CLASSIFIÉ
+# SECTION 1 — OBJECTIF DU PROTOCOLE
+Le présent document définit l’intégralité du comportement autorisé et attendu du système agent-machine.
+Objectifs :
+- Automatisation totale
+- Vérification continue
+- Actions séquencées
+- Zéro destruction sans ordre
+- Gestion complète des workflows GitHub
+- Synchronisation doc + code
 
-## 0. OBJECTIF
-Ce protocole définit les règles obligatoires que tout agent GPT doit suivre pour travailler sur le projet empreinte_verif.
-Aucune action n’est autorisée sans validation explicite de l’utilisateur, sauf exceptions décrites (Mode 4 autorisé par le propriétaire).
+# SECTION 2 — RÈGLES DE BOOT
+Au démarrage, l’agent DOIT charger :
+- docs/DOCS_MANIFEST.yaml
+- docs/AGENT_START.md
+- docs/NEXT_ACTION.md
+- docs/TASKS.md
+- docs/STATE_PROJECT.md
 
-## 1. SCANS OBLIGATOIRES AVANT TOUTE RÉPONSE
-L’agent effectue 6 scans obligatoires (privé, miroir, docs, branches, NEXT_ACTION, GitHub Actions).
-→ (description inchangée et obligatoire)
+Puis vérifier la présence de :
+- /lib
+- /web
+- /android
+- /ios
+- /.github/workflows
 
-## 2. MODE D'AUTONOMIE (Mode 4 — Mix IA + Commit + Timer)
-Le propriétaire a autorisé explicitement Mode 4 (OUI MODE 4). Dans ce mode :
-- Agents peuvent exécuter automatiquement les tâches de diagnostic, réparation non destructive, build et déploiement si :
-  - les workflows d’autodiagnostic retournent "OK" ou mesures réparées.
-  - aucun secret sensible n’est exposé.
-- Agents DOIVENT journaliser chaque action dans HISTORY.md et STATE_PROJECT.md.
-- Agents DOIVENT demander validation pour toute modification manuelle de code source applicatif (lib/*) qui change la logique métier.
-- Autorisé : modifications automatisées non invasives (scripts, docs, workflows).
-- Interdit : committer des secrets, modifier build/web ou ajouter des clés privées.
+Puis analyser NEXT_ACTION.status :
+- BLOCKING → STOP total
+- OPEN → exécution autorisée
 
-## 3. RAPPORT INITIAL — FORMAT OBLIGATOIRE
-Après les scans, l’agent produira exactement :
+Puis produire :
 [PROTOCOL INITIAL REPORT – LEVEL RED]
-1. Private repo access: OK/NON
-2. Mirror repo access: OK/NON
-3. Docs loaded: <liste>
-4. Last commit (private): <hash>
-5. Last commit (mirror): <hash>
-6. Sync status: SYNC / OUTDATED
-7. NEXT ACTION: <copie exacte>
 
-Puis attendre validation sauf si Mode 4 est actif et la NEXT_ACTION est 'Run self-diagnosis / Auto-deploy' — dans ce cas l’agent peut exécuter et ensuite rapporter.
+# SECTION 3 — SCANS OBLIGATOIRES
+SCAN 1 — repo privé  
+SCAN 2 — repo miroir  
+SCAN 3 — docs complètes  
+SCAN 4 — diff commits  
+SCAN 5 — NEXT_ACTION  
+SCAN 6 — workflows GitHub  
+SCAN 7 — secrets GitHub  
+SCAN 8 — structure Flutter  
+SCAN 9 — derniers workflows  
 
-## 4. RÈGLES D'OR
-- Toujours fournir le fichier complet corrigé.
-- Une seule action par étape sauf opérations automatisées approuvées (Mode 4).
-- Jamais exposer les secrets.
+Tous → rapport standardisé.
 
-## 5. MODULES AUTONOMES (v4-v12)
-Le système face à Mode 4 utilise un ensemble de modules autonomes :
-- v4 — Self Diagnosis (scan HTTP/SSL, workflows, assets)
-- v5 — Auto-Repair (corriger manifestes, petits fixes, re-generate assets)
-- v6 — Intelligence Flutter Avancée (analyse static/dartfmt, suggestion refactor)
-- v7 — UI Analysis (screenshots, diff visuel, accessibility checks)
-- v8 — Production Observer (24/7 health checks)
-- v9..v12 — Extended automation (auto-refactor rules, rollback manager, security hardening, telemetry)
-Les agents doivent enregistrer chaque exécution dans STATE_PROJECT.md et HISTORY.md.
+# SECTION 4 — FORMAT DES RAPPORTS
+[REPORT TYPE – LEVEL X]
+timestamp: <AUTO>
+agent_version: <AUTO>
+status: OK | WARNING | ERROR | BLOCKED
+details:
+  - key: value
+next_action:
+  id: <id>
+  blocking: true|false
 
-## 6. CONDITIONS D'ARRÊT
-Agent stop immédiatement si :
-- un secret manquant ou exposé
-- build produit erreur critique
-- miroir non disponible
-- directive humaine explicite : "STOP"
+Types valides :
+- PROTOCOL INITIAL REPORT – LEVEL RED
+- DELTA REPORT – LEVEL BLUE
+- STATUS REPORT – LEVEL ORANGE
+- FINAL OPERATION REPORT – LEVEL GREEN
+- HEARTBEAT REPORT – LEVEL WHITE
 
-## 7. MISE EN PRATIQUE
-- Les workflows GitHub appropriés doivent exister (.github/workflows/auto_deploy.yml).
-- Les scripts doivent être non-interactifs et idempotents.
-- Les logs doivent être produits à chaque étape.
+# SECTION 5 — SEQUENCE OFFICIELLE
+ÉTAPE 1 — BOOT  
+→ charger manifest & docs  
+→ exécuter scans  
+→ produire INITIAL REPORT  
+→ STOP si BLOCKING
 
-FIN — AGENT_PROTOCOL.md v3.0 (Mode 4 activé)
+ÉTAPE 2 — SYNC  
+→ comparer privé ↔ miroir  
+→ DELTA REPORT  
+→ STOP
+
+ÉTAPE 3 — ANALYSE FLUTTER  
+→ analyser structure  
+→ STATUS REPORT  
+→ STOP
+
+ÉTAPE 4 — ACTION  
+→ exécuter tâches  
+→ mettre à jour docs, state, tasks  
+→ FINAL OPERATION REPORT  
+→ STOP TOTAL
+
+# SECTION 6 — ERREURS
+ERROR 01 — doc manquante  
+ERROR 02 — manifest corrompu  
+ERROR 03 — workflow absent  
+ERROR 04 — secrets manquants  
+ERROR 05 — flutter structure cassée  
+ERROR 06 — déploiement échoué  
+ERROR 07 — build cassé  
+ERROR 08 — next_action invalide  
+ERROR 09 — sync impossible  
+ERROR 10 — heartbeat anomaly  
+
+En cas d’erreur :
+- rapport ERROR obligatoire
+- proposer 3 solutions
+- aucune action destructive
+
+# SECTION 7 — MODE BLOQUANT
+status = BLOCKING →
+- ne rien exécuter
+- ne rien modifier
+- uniquement analyser + rapporter
+
+# SECTION 8 — MODE AUTONOME
+status = OPEN →
+peut exécuter automatiquement :
+- CI/CD
+- post-tests
+- rollback
+- heartbeat
+- sync
+
+Doit mettre à jour :
+- TASKS.md
+- STATE_PROJECT.md
+- HISTORY.md (si présent)
+
+# SECTION 9 — MOTS CLÉS RÉSERVÉS
+STOP  
+EXECUTE  
+VALIDER ÉTAPE <X>  
+BLOCKING TRUE  
+AUTO_MODE  
+
+# SECTION 10 — FIN
+Toute corruption → arrêt automatique du système.
+
+END OF FILE
