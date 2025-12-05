@@ -1,0 +1,70 @@
+name: Self Diagnosis — v4.0
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    # daily at 03:30 UTC (modifiable)
+    - cron: '30 3 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  self-diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node (for optional tools)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.0'
+
+      - name: Ensure execute permissions on scripts
+        run: |
+          chmod +x .github/scripts/self_diagnose.sh || true
+
+      - name: Run self diagnosis script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOMAIN: qrpruf.sanadidari.com
+          MIRROR_REPO: sanadidari/empreinte_verif_mirror
+        run: |
+          ./.github/scripts/self_diagnose.sh
+
+      - name: Upload diagnostics artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics-logs
+          path: diagnostics || diagnostic || ./diagnostics || .
+
+      - name: Open GitHub Issue on CRITICAL (if created by script)
+        if: steps.self_diagnose.outcome == 'failure' || always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = './diagnostics/issue.json';
+            if (fs.existsSync(path)) {
+              const content = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const title = content.title || 'Self-Diagnosis: Critical issue detected';
+              const body = content.body || 'Auto-report attached.';
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+              });
+            } else {
+              core.info('No issue.json found — nothing to post.');
+            }

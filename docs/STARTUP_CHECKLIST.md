@@ -106,4 +106,21 @@ Tu fournis :
   - exécution des commandes git locales (push)
 
 ----------------------------------------------------------------------
-FIN DU FICHIER — STARTUP_CHECKLIST.md v3.0
+
+## STARTUP_CHECKLIST.md — STARTUP PROTOCOL v4.0
+Projet : empreinte_verif — Self-Diagnosis
+
+Ajouts v4.0 :
+- Le mode SELF-DIAGNOSIS est actif : à chaque boot l'agent exécute
+  la routine complète (v3.0) + déclenche le self_diagnose workflow si
+  requis (si push ou schedule).
+
+Checklist courte :
+1. Vérifier miroir public accessible.
+2. Charger /docs (ordre v4.0).
+3. Lancer SCANS automatiques (Git, Docs, CI, Domaine, Code).
+4. Si anomalies -> générer rapport et suggestion.
+5. Pour anomalies CRITICAL -> attendre validation humaine.
+
+FIN — STARTUP_CHECKLIST.md v4.0
+

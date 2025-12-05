@@ -83,4 +83,15 @@ Chaque agent doit :
 ❌ Agir contre la décision humaine
 
 ----------------------------------------------------------------------
-FIN DU FICHIER — RULES.md v3.0 (FULL INTELLIGENCE)
+## RULES.md — MILITARY OPERATING RULES v4.0
+
+Ajouts v4.0 (Self-Diagnosis) :
+- L'agent exécute la routine SELF-DIAGNOSIS automatiquement au push & sur schedule.
+- En cas d'anomalie CRITICAL, l'agent crée une issue GitHub et met le statut
+  dans STATE_PROJECT.md en "INVESTIGATE".
+- L'agent peut proposer PR drafts, mais ne pousse jamais sans approbation.
+- Les notifications externes (Slack) sont optionnelles et demandent SLACK_WEBHOOK.
+- Toute recommandation créée automatiquement doit être priorisée (CRITICAL/HIGH/...).
+
+FIN — RULES.md v4.0
+
