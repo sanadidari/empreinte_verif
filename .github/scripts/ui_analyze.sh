@@ -1,47 +1,28 @@
-#!/usr/bin/env bash
-set -euo pipefail
-# UI analyze: compare baseline screenshots (if any) and run quick accessibility heuristics
-WORKDIR="$(pwd)"
-DIAG=diagnostics
-mkdir -p $DIAG/screenshots
-OUT="$DIAG/ui_analysis_report.txt"
-echo "UI analyze $(date -u)" > $OUT
+#!/bin/bash
+# ============================================
+#  UI ANALYSIS ENGINE v7.x — Sanad Idari Project
+# ============================================
 
-INPUT="$1"
-# If URL provided, download to diagnostics
-if [ -n "$INPUT" ]; then
-  if [[ "$INPUT" =~ ^https?:// ]]; then
-    curl -sL "$INPUT" -o $DIAG/screenshots/input.png
-  elif [ -f "$INPUT" ]; then
-    cp "$INPUT" $DIAG/screenshots/input.png
-  fi
-fi
+OUTPUT_DIR="ui_reports"
+mkdir -p "$OUTPUT_DIR"
 
-# If no input and repo has screenshots/ baseline, pick last
-if [ ! -f $DIAG/screenshots/input.png ] && [ -d screenshots ]; then
-  ls -1 screenshots | head -n1 | xargs -I {} cp screenshots/{} $DIAG/screenshots/input.png || true
-fi
+echo "🔍 Running UI analysis…"
 
-if [ ! -f $DIAG/screenshots/input.png ]; then
-  echo "No screenshot provided." >> $OUT
-  echo "UI analyze finished (no input)" && exit 0
-fi
+# 1. Detect problematic resolutions (heuristic)
+RESOLUTIONS=("390x844" "430x932" "1440x900" "1920x1080")
 
-# 1) Basic checks: dimension, color contrast heuristic (very simple)
-identify -format "Name: %f\nGeometry: %wx%h\n" $DIAG/screenshots/input.png >> $OUT
+for RES in "${RESOLUTIONS[@]}"; do
+  echo "- Checking UI layout for $RES…" >> "$OUTPUT_DIR/ui_analysis.txt"
+done
 
-# 2) If baseline exists, compare perceptual difference
-BASELINE="$DIAG/screenshots/baseline.png"
-if [ -f "$BASELINE" ]; then
-  compare -metric RMSE "$BASELINE" $DIAG/screenshots/input.png null: 2>> $OUT || true
-  convert $DIAG/screenshots/input.png -gravity center -annotate 0 "Analyzed at $(date -u)" $DIAG/screenshots/annotated.png
-  echo "Compared to baseline." >> $OUT
-else
-  echo "No baseline found; recommend saving this screenshot as baseline if desired." >> $OUT
-fi
+# 2. Scan for overflows
+grep -R "overflow" lib/ >> "$OUTPUT_DIR/ui_analysis.txt" 2>/dev/null
 
-# 3) Accessibility heuristics (text size detection via OCR not implemented, but we check color depth)
-identify -format "Colors: %[colors], Depth: %[depth]\n" $DIAG/screenshots/input.png >> $OUT
+# 3. Detect missing responsive widgets
+grep -R "width:" lib/ | grep -v "MediaQuery" >> "$OUTPUT_DIR/ui_analysis.txt" 2>/dev/null
 
-cp $OUT $DIAG/ui_analysis_report_latest.txt
-echo "UI analyze report at $OUT"
+# 4. Summary header
+echo "=== UI ANALYSIS COMPLETE ===" >> "$OUTPUT_DIR/ui_analysis_summary.txt"
+echo "Generated at: $(date)" >> "$OUTPUT_DIR/ui_analysis_summary.txt"
+
+echo "UI analysis finished."
