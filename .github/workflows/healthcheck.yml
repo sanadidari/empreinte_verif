@@ -1,0 +1,105 @@
+name: Healthcheck — Production Monitor
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"   # Every 2 hours
+  workflow_dispatch:
+
+env:
+  DOMAIN: "https://qrpruf.sanadidari.com"
+
+jobs:
+  monitor:
+    name: Global Healthcheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Start healthcheck
+        run: |
+          echo "=== Starting production healthcheck ==="
+          echo "Domain: $DOMAIN"
+
+      - name: Check main page HTTP status
+        run: |
+          STATUS=$(curl -s -o page.html -w "%{http_code}" "$DOMAIN")
+          echo "Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "ERROR: Bad HTTP status: $STATUS"
+            exit 10
+          fi
+
+      - name: Measure load time
+        run: |
+          TIME=$(curl -s -o /dev/null -w "%{time_total}" "$DOMAIN")
+          echo "Load time: ${TIME}s"
+          if (( $(echo "$TIME > 5" | bc -l) )); then
+            echo "WARNING: Load time slow: $TIME sec" > slow_time.txt
+          fi
+
+      - name: Validate HTML size
+        run: |
+          SIZE=$(wc -c < page.html)
+          echo "HTML size: $SIZE"
+          if [ "$SIZE" -lt 3000 ]; then
+            echo "ERROR: Page is too small — possible corruption"
+            exit 11
+          fi
+
+      - name: Check for visible errors in HTML
+        run: |
+          if grep -iE "error|exception|stacktrace|not found|Cannot GET" page.html; then
+            echo "ERROR: HTML contains visible errors"
+            exit 12
+          fi
+          echo "✔ No visible errors detected."
+
+      - name: Check main.dart.js availability
+        run: |
+          STATUS=$(curl -s -o main.js -w "%{http_code}" "$DOMAIN/main.dart.js")
+          echo "main.dart.js status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "ERROR: main.dart.js missing"
+            exit 13
+          fi
+          SIZE=$(wc -c < main.js)
+          if [ "$SIZE" -lt 200000 ]; then
+            echo "ERROR: main.dart.js too small — corrupted?"
+            exit 14
+          fi
+          echo "✔ main.dart.js OK"
+
+      - name: Check manifest.json availability
+        run: |
+          STATUS=$(curl -s -o manifest.json -w "%{http_code}" "$DOMAIN/manifest.json")
+          if [ "$STATUS" != "200" ]; then
+            echo "ERROR: Manifest missing"
+            exit 15
+          fi
+          echo "✔ manifest.json OK"
+
+      - name: Upload all collected files
+        uses: actions/upload-artifact@v4
+        with:
+          name: healthcheck-artifacts
+          path: |
+            page.html
+            main.js
+            manifest.json
+            slow_time.txt
+
+      - name: Auto-create GitHub Issue if failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.create({
+              ...context.repo,
+              title: "⚠️ Healthcheck failure detected",
+              body: "A production check has failed. Please inspect logs and artifacts."
+            })
+
+      - name: Success message
+        if: success()
+        run: echo "✔ Production healthcheck passed successfully."
