@@ -1,0 +1,42 @@
+name: Auto Publish to Google Play (v14)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'release-*'
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      SERVICE_ACCOUNT_JSON: ${{ secrets.GPLAY_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Install deps
+        run: flutter pub get
+
+      - name: Build AAB
+        run: |
+          # assume keystore will be created from secret (base64)
+          mkdir -p android/keystores
+          echo "$KEYSTORE_BASE64" | base64 -d > android/keystores/upload-keystore.jks || true
+          flutter build appbundle --release
+
+      - name: Publish to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlain: "${{ secrets.GPLAY_SERVICE_ACCOUNT }}"
+          packageName: com.sanadidari.empreinte
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal

@@ -1,0 +1,20 @@
+name: sanadidari-agent-brain
+version: "v1"
+autonomy:
+  enabled: true
+  allowed_modules:
+    - auto_testing (v13)
+    - auto_publish (v14)
+    - resident_os (v15)
+  startup_checks:
+    - verify_docs: true
+    - verify_workflows: true
+    - verify_secrets: true
+policies:
+  require_human_for:
+    - destructive_changes
+    - secret_rotation
+  auto_actions_allowed:
+    - run_tests
+    - produce_reports
+    - attempt_auto_fix (safe)
