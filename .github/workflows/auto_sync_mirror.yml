@@ -1,0 +1,65 @@
+name: Auto Sync Mirror — Private → Mirror Sync
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  sync_mirror:
+    name: Synchronize private repo with mirror
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      MIRROR_REPO: https://github.com/sanadidari/empreinte_verif_mirror.git
+
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # FULL history required
+
+      - name: Set up SSH deploy key
+        run: |
+          echo "${{ secrets.MIRROR_DEPLOY_KEY }}" > mirror_key
+          chmod 600 mirror_key
+
+      - name: Configure Git for mirror
+        run: |
+          git config --global user.email "sync-bot@system.local"
+          git config --global user.name "Mirror Sync Bot"
+          git remote add mirror $MIRROR_REPO || true
+          git remote set-url mirror $MIRROR_REPO
+
+      - name: Push force to mirror (safe overwrite)
+        run: |
+          echo "Pushing all commits to mirror repository..."
+          GIT_SSH_COMMAND="ssh -i $PWD/mirror_key -o StrictHostKeyChecking=no" \
+            git push mirror main --force
+
+      - name: Create sync report
+        run: |
+          echo "# MIRROR SYNC REPORT" > sync_report.md
+          echo "Timestamp: $(date)" >> sync_report.md
+          echo "Source commit: $(git rev-parse HEAD)" >> sync_report.md
+          echo "Target: empreinte_verif_mirror" >> sync_report.md
+
+      - name: Upload sync report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mirror-sync-report
+          path: sync_report.md
+
+      - name: Notify sync
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: 1,
+              body: `🔄 Mirror sync completed successfully.\nCommit: **${{ github.sha }}**`
+            })
