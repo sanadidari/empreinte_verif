@@ -1,1 +1,2 @@
-jq==1.0
+# placeholder for Python deps; engine uses stdlib only for now
+# keep file so workflows can `pip install -r`

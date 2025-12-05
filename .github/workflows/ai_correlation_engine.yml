@@ -1,0 +1,62 @@
+name: AI Correlation Engine — Link incidents & suggest fixes
+
+on:
+  workflow_run:
+    workflows:
+      - "AI Crash Investigator — Automated Root Cause Analysis"
+      - "AI Root-Cause Database — Incident Memory Engine"
+      - "Auto-Heal Engine — Flutter Project Self-Repair"
+      - "Sentry Integration — Error & Crash Pipeline"
+    types:
+      - completed
+
+  workflow_dispatch:
+
+env:
+  RCDB_PATH: "docs/ROOT_CAUSE_DB.json"
+  CORR_PATH: "docs/ROOT_CAUSE_CORRELATIONS.json"
+  OUT_DIR: "/tmp/rc_correlate"
+
+jobs:
+  correlate:
+    name: Correlate incidents and generate suggestions
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Prepare environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tools/ai_requirements.txt || true
+          mkdir -p $OUT_DIR
+
+      - name: Run correlation analyzer
+        run: |
+          python tools/ai_correlation_engine.py \
+            --rcdb "${{ env.RCDB_PATH }}" \
+            --out "${{ env.CORR_PATH }}" \
+            --tmpdir "${{ env.OUT_DIR }}" || true
+
+      - name: Upload correlation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc-correlations
+          path: ${{ env.CORR_PATH }}
+
+      - name: Commit correlations (if changed)
+        run: |
+          git config --local user.email "rcdb@system.local"
+          git config --local user.name "RCDB Correlator"
+          git add ${{ env.CORR_PATH }} || true
+          git commit -m "chore: update ROOT_CAUSE_CORRELATIONS.json (auto correlation)" || echo "No changes to commit"
+          git push origin HEAD:main || echo "Push skipped (no changes or protected branch)"
