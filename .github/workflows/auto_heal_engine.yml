@@ -1,0 +1,177 @@
+name: Auto-Heal Engine — Flutter Project Self-Repair
+
+on:
+  workflow_run:
+    workflows:
+      - "CI / CD — Flutter Web → Vercel"
+      - "Auto Deploy — Flutter Web → Vercel"
+      - "Auto Lint & Fix — Flutter Code Maintainer"
+      - "Reporting Aggregator — Logs & Alerts"
+      - "Sentry Integration — Error & Crash Pipeline"
+      - "Auto Guardian — Project Integrity Shield"
+    types:
+      - completed
+
+  workflow_dispatch:
+
+jobs:
+  auto_heal:
+    name: Diagnose & Repair Flutter Project
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Run basic diagnostics
+        id: diag
+        run: |
+          echo "=== AUTO-HEAL INITIAL DIAGNOSTICS ==="
+          ERRORS=0
+
+          if ! flutter pub get; then
+            echo "pub_get_failed=true" >> $GITHUB_OUTPUT
+            ERRORS=$((ERRORS+1))
+          fi
+
+          if ! dart analyze > analyze.txt 2>&1; then
+            echo "analyze_failed=true" >> $GITHUB_OUTPUT
+            ERRORS=$((ERRORS+1))
+          fi
+
+          if [ ! -f "web/index.html" ]; then
+            echo "missing_index=true" >> $GITHUB_OUTPUT
+            ERRORS=$((ERRORS+1))
+          fi
+
+          if [ ! -f "web/manifest.json" ]; then
+            echo "missing_manifest=true" >> $GITHUB_OUTPUT
+            ERRORS=$((ERRORS+1))
+          fi
+
+          if [ ! -f "web/flutter_bootstrap.js" ]; then
+            echo "missing_bootstrap=true" >> $GITHUB_OUTPUT
+            ERRORS=$((ERRORS+1))
+          fi
+
+          echo "error_count=$ERRORS" >> $GITHUB_OUTPUT
+
+      - name: Auto-repair pubspec mismatches
+        if: steps.diag.outputs.pub_get_failed == 'true'
+        run: |
+          echo "🛠 Repairing pubspec.yaml..."
+          # Remove temporary or corrupted lockfile
+          rm -f pubspec.lock || true
+          flutter pub get || true
+
+      - name: Auto-repair missing web files
+        run: |
+          mkdir -p web
+
+          if [ "${{ steps.diag.outputs.missing_index }}" = "true" ]; then
+            echo "Generating default index.html..."
+cat <<EOF > web/index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Flutter Web</title>
+  <meta name="description" content="Recovered by Auto-Heal Engine" />
+</head>
+<body>
+  <script src="flutter_bootstrap.js"></script>
+</body>
+</html>
+EOF
+          fi
+
+          if [ "${{ steps.diag.outputs.missing_manifest }}" = "true" ]; then
+            echo "Generating manifest.json..."
+cat <<EOF > web/manifest.json
+{
+  "name": "empreinte_verif",
+  "short_name": "empreinte",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#317EFB"
+}
+EOF
+          fi
+
+          if [ "${{ steps.diag.outputs.missing_bootstrap }}" = "true" ]; then
+            echo "Generating fallback bootstrap..."
+            echo "// Auto-generated bootstrap by Auto-Heal Engine" > web/flutter_bootstrap.js
+          fi
+
+      - name: Auto-repair missing assets
+        run: |
+          echo "Checking for missing assets in pubspec.yaml..."
+          if grep -q "assets:" pubspec.yaml; then
+            mkdir -p assets || true
+          fi
+
+      - name: Auto-fix Dart issues
+        run: |
+          flutter fix --apply || true
+          dart format lib web || true
+
+      - name: Re-run flutter build (test build)
+        id: buildtest
+        run: |
+          echo "Testing Flutter Web build..."
+          if flutter build web --release; then
+            echo "build_ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "build_ok=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop if no repairs needed
+        if: steps.diag.outputs.error_count == '0'
+        run: |
+          echo "No healing actions needed."
+          exit 0
+
+      - name: Commit auto-heal fixes
+        run: |
+          git config --local user.email "autoheal@system.local"
+          git config --local user.name "Auto-Heal Engine"
+
+          git add lib web pubspec.yaml || true
+          git commit -m "fix: auto-heal engine repair (flutter diagnostics)" || echo "Nothing to commit"
+
+      - name: Push auto-heal branch
+        run: |
+          BR="auto-heal-$(date +%s)"
+          git checkout -b "$BR"
+          git push origin "$BR"
+
+      - name: Open pull request with fixes
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "auto-heal-$(date +%s)"
+          title: "Auto-Heal Engine — Automated Repair Patch"
+          body: |
+            The Auto-Heal Engine detected errors in the Flutter project and applied repairs.
+
+            Diagnostics:
+            - pub get failure: ${{ steps.diag.outputs.pub_get_failed }}
+            - analyze failure: ${{ steps.diag.outputs.analyze_failed }}
+            - missing index: ${{ steps.diag.outputs.missing_index }}
+            - missing manifest: ${{ steps.diag.outputs.missing_manifest }}
+            - missing bootstrap: ${{ steps.diag.outputs.missing_bootstrap }}
+            - build success: ${{ steps.buildtest.outputs.build_ok }}
+
+            Please review and merge if correct.
+
+      - name: Final Log
+        run: echo "Auto-Heal Engine completed."
