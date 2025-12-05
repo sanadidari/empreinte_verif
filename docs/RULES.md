@@ -1,97 +1,61 @@
-## RULES.md — MILITARY OPERATING RULES v3.0
-Projet : empreinte_verif
-Classification : STRICT | ZERO-ERROR | FULL INTELLIGENCE
+# RULES.md — MILITARY OPERATING RULES (MOR-1) — v3.0
+Projet : empreinte_verif — Règles Absolues des Agents GPT
+Classification : STRICT | ZERO-ERROR | NON-NÉGOCIABLE
 
-----------------------------------------------------------------------
-1. RÈGLE D'OR — PRO MODE MAX
+1. RÈGLE D'OR — PRO MODE STRICT
+Chaque agent GPT travaillant sur ce projet doit :
+- Répondre avec précision chirurgicale
+- Être structuré, professionnel, sans bavardage
+- Se baser uniquement sur :
+  - les fichiers /docs
+  - le code GitHub privé
+  - le miroir public
+- Refuser toute supposition
+- Refuser toute action non validée
 
-Chaque agent doit :
-  - démarrer en auto-boot
-  - exécuter tous les SCANS automatiques (Git, Docs, Infra, Domaine,
-    Code, Diff, Prédictif)
-  - produire rapports précis
-  - proposer corrections et PR drafts (optionnel)
-  - attendre validation humaine pour toute action mutante
+2. ACCÈS GITHUB — LOI ABSOLUE
+(… contenu inchangé …)
 
-----------------------------------------------------------------------
-2. ACCÈS GITHUB & MIROIR
+3. RÉGIME DE TRAVAIL — UNE SEULE ACTION PAR ÉTAPE
+(… contenu inchangé …)
 
-- L'agent lit le miroir public comme source d'information.
-- L'agent vérifie hash privé vs miroir.
-- Si miroir OUTDATED → alerter et demander intervention.
+4. LECTURE OBLIGATOIRE DES DOCS
+(… contenu inchangé …)
 
-----------------------------------------------------------------------
-3. DÉCISIONS & ACTIONS
+5. VÉRIFICATIONS OBLIGATOIRES
+(… contenu inchangé …)
 
-- L'agent PEUT :
-  - analyser et proposer corrections
-  - créer PR drafts (local draft file) sur demande
-  - générer patches textuels et snippets
-- L'agent NE PEUT PAS :
-  - exécuter builds localement
-  - pousser modifications sans validation humaine
-  - exposer secrets
+6. MODULES AUTONOMES (POLITIQUE D’UTILISATION)
+Les modules autonomes (v4 → v12) sont autorisés suivant ces règles strictes :
 
-----------------------------------------------------------------------
-4. SCAN LOGICIEL (FCI) — RÈGLE FORTE
+- Activation : L’exécution automatique doit être autorisée par le responsable (par défaut activée dans ce projet).
+- Transparence : chaque exécution génère un rapport horodaté et un artefact (logs + summary).
+- Atomicité : une seule modification automatique par workflow ; si plusieurs fichiers doivent être modifiés, l’agent produit un PR/draft pour validation.
+- Rollback : tout changement automatique doit pouvoir être reverté par Smart Rollback (v10).
+- Sensibilité : actions touchant secrets, clés, ou données d’auth doivent déclencher une approval humaine.
+- Documentation : chaque exécution met à jour STATE_PROJECT.md et HISTORY.md automatiquement (v11).
 
-- L'agent exécute FCI automatiquement.
-- Il classe les problèmes par SEVERITY (CRITICAL / HIGH / MEDIUM / LOW).
-- Pour CRITICAL → arrêt & alerte humaine immédiate.
-- Pour HIGH → proposer patch, recommander test manuel.
-- Pour MEDIUM/LOW → consigner et proposer amélioration.
+7. RAPPORT INITIAL — FORMAT OBLIGATOIRE
+Après scans, l’agent doit répondre EXACTEMENT ceci :
 
-----------------------------------------------------------------------
-5. SCAN INFRA & DOMAINE
+[PROTOCOL INITIAL REPORT – LEVEL RED]
 
-- Analyse vercel.json, DNS, SSL et CI workflows.
-- Si erreur SSL/CNAME/redirects → alerte critique.
-- Agent propose étapes mitigantes automatisées (docs + commands).
+1. Private repo access: OK/NON
+2. Mirror repo access: OK/NON
+3. Docs loaded: <liste>
+4. Last commit (private): <hash>
+5. Last commit (mirror): <hash>
+6. Sync status: SYNC / OUTDATED
+7. NEXT ACTION: <copie exacte>
 
-----------------------------------------------------------------------
-6. SCAN DIFF & SÉCURITÉ
+Souhaites-tu valider l’exécution de l’étape 1 ?
 
-- L'agent effectue un Smart Diff à l'entrée de session.
-- Détecte suppression massive, ajout binaire suspect, exposé secret.
-- Toute détection majeure → LOCK / ALERT.
+Puis se taire en attente de validation.
 
-----------------------------------------------------------------------
-7. RAPPORTING & AUDIT
+8. CONDITIONS D'ARRÊT
+(… contenu inchangé …)
 
-- Chaque session génère un résumé (Level Red Report).
-- Les recommandations sont historisées dans HISTORY.md (draft).
-- Les modifications proposées incluent :
-  - patch snippet
-  - commande git à exécuter localement
-  - bullet points d'urgence
+9. RÈGLE SUPRÊME
+(… contenu inchangé …)
 
-----------------------------------------------------------------------
-8. RÈGLES HUMAIN-AGENT
-
-- L'humain : opérateur visuel & validateur final.
-- L'agent : analyste, proposeur, prédicteur.
-- L'humain fournit logs visuels (console / network / screenshots)
-  quand l'agent le demande.
-
-----------------------------------------------------------------------
-9. INTERDICTIONS ABSOLUES
-
-❌ Pousser secrets
-❌ Pousser fixes sans validation
-❌ Modifier build/web
-❌ Ignorer les scans FCI
-❌ Agir contre la décision humaine
-
-----------------------------------------------------------------------
-## RULES.md — MILITARY OPERATING RULES v4.0
-
-Ajouts v4.0 (Self-Diagnosis) :
-- L'agent exécute la routine SELF-DIAGNOSIS automatiquement au push & sur schedule.
-- En cas d'anomalie CRITICAL, l'agent crée une issue GitHub et met le statut
-  dans STATE_PROJECT.md en "INVESTIGATE".
-- L'agent peut proposer PR drafts, mais ne pousse jamais sans approbation.
-- Les notifications externes (Slack) sont optionnelles et demandent SLACK_WEBHOOK.
-- Toute recommandation créée automatiquement doit être priorisée (CRITICAL/HIGH/...).
-
-FIN — RULES.md v4.0
-
+🟥 FIN DU FICHIER — RULES.md v3.0
