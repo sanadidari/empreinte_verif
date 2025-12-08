@@ -1,13 +1,12 @@
 {
+  "version": 2,
+
   "cleanUrls": true,
   "trailingSlash": false,
+
   "rewrites": [
     {
       "source": "/install",
-      "destination": "/static/install.html"
-    },
-    {
-      "source": "/install.html",
       "destination": "/static/install.html"
     },
     {
@@ -15,8 +14,29 @@
       "destination": "/static/setup.html"
     },
     {
+      "source": "/install.html",
+      "destination": "/static/install.html"
+    },
+    {
       "source": "/setup.html",
       "destination": "/static/setup.html"
+    }
+  ],
+
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ],
+
+  "redirects": [
+    {
+      "source": "/install/",
+      "destination": "/install",
+      "permanent": false
     }
   ]
 }
