@@ -1,43 +1,51 @@
-// ===============================================================
-// main.dart — Point d'entrée principal de l'application
-// Projet : empreinte_verif
-// Version : PRO Military v3.1
-// ===============================================================
-
 import 'package:flutter/material.dart';
 
-// Configuration globale
 import 'config/app_config.dart';
-
-// Thème général
-import 'core/theme.dart';
-
-// Vue principale (LOGIN)
 import 'views/login_view.dart';
+import 'views/home_view.dart';
+import 'views/biometric_test_view.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+/// ---------------------------------------------------------------------------
+/// Empreinte Verif — main.dart PRO
+/// ---------------------------------------------------------------------------
+/// - Point d’entrée unique de l’application
+/// - Utilise le système PRO de vues : LoginView / HomeView / BiometricTestView
+/// - Aucune logique biométrique directement ici : tout passe par les services
+/// - Prêt pour l’intégration API + SecureStorage dans les vues
+/// ---------------------------------------------------------------------------
 
-  // (optionnel) Initialisation future : services, biométrie, API, etc.
-  // ex: await Firebase.initializeApp(); (si tu ajoutes un backend futur)
-
-  runApp(const EmpreinteVerifApp());
+void main() {
+  runApp(const EmpreinteApp());
 }
 
-class EmpreinteVerifApp extends StatelessWidget {
-  const EmpreinteVerifApp({super.key});
+class EmpreinteApp extends StatelessWidget {
+  const EmpreinteApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Nom officiel de l’application (centralisé dans AppConfig)
       title: AppConfig.appName,
-      debugShowCheckedModeBanner: AppConfig.debug,
 
-      // Thème global
-      theme: AppTheme.lightTheme,
+      // On garde une UI propre sans bandeau "debug" en haut à droite.
+      debugShowCheckedModeBanner: false,
 
-      // Vue de démarrage : AUTHENTIFICATION BIOMÉTRIQUE
+      // Thème simple et propre, pourra être relié plus tard à un Theme PRO.
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: const Color(0xfff2f2f2),
+        useMaterial3: false,
+      ),
+
+      // Écran de démarrage officiel : LoginView (système PRO)
       home: const LoginView(),
+
+      // Routes nommées principales, utilisables partout dans l’app
+      routes: {
+        '/login': (context) => const LoginView(),
+        '/home': (context) => const HomeView(),
+        '/biometric-test': (context) => const BiometricTestView(),
+      },
     );
   }
 }
