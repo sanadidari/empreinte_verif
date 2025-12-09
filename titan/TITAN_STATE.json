@@ -1,4 +1,11 @@
 {
-  "last_action": "none",
-  "history": []
+  "last_action": "idle",
+  "history": [
+    {
+      "time": "2025-12-09T04:00:40.093327",
+      "action": "idle",
+      "result": "idle"
+    }
+  ],
+  "last_run": "2025-12-09T04:00:40.093327"
 }
