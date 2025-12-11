@@ -30,15 +30,14 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    // -----------------------------------------
-    // TOKEN FIXE POUR LES TESTS AVEC SUPABASE
-    // -----------------------------------------
-    final token = "123456789_TEST_TOKEN"; // <= TOKEN FIXE
+    // 🔥 NOUVEAU : on récupère le token réel stocké dans l'appareil
+    final token = await SecureStorage.getToken();
 
-    // Sauvegarde locale
-    await SecureStorage.saveToken(token);
+    if (token == null || token.isEmpty) {
+      setState(() => status = "❌ Aucun token trouvé.\nVeuillez contacter l’administrateur.");
+      return;
+    }
 
-    // Auth API Supabase
     final api = await ApiService.authEmployee(token);
 
     if (api["success"] == true) {
