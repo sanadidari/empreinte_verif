@@ -3,6 +3,7 @@ import '../services/biometric_service.dart';
 import '../services/secure_storage.dart';
 import '../services/api_service.dart';
 import 'home_view.dart';
+import 'activation_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -14,6 +15,27 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final bio = BiometricService();
   String status = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _checkToken();
+  }
+
+  // 🔵 Vérifie si l’app a bien été activée
+  Future<void> _checkToken() async {
+    final token = await SecureStorage.getToken();
+
+    if (token == null || token.isEmpty) {
+      // ❌ Aucun token → activation obligatoire
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const ActivationView()),
+        );
+      });
+    }
+  }
 
   Future<void> authenticate() async {
     setState(() => status = "Vérification biométrique…");
@@ -30,11 +52,15 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    // 🔥 NOUVEAU : on récupère le token réel stocké dans l'appareil
+    // 🔵 On récupère le token stocké
     final token = await SecureStorage.getToken();
 
     if (token == null || token.isEmpty) {
-      setState(() => status = "❌ Aucun token trouvé.\nVeuillez contacter l’administrateur.");
+      setState(() => status = "❌ Activation requise.");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ActivationView()),
+      );
       return;
     }
 
